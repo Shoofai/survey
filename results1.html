@@ -185,7 +185,7 @@
     </div>
 
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxy8oJeLRHe6sQKFnUof1LllO6aVJeHA_HvQ6Rb3JcRp1o6v8aDwEggN6fX3HqeAvSyxA/exec?survey=survey1';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbywR36kKJcmRgfAWPuIRJ_DsZ-Rcw2xhxQeot6jXjkuTO32Sq8BSftJVNkkUqvvI7h37g/exec?survey=survey1';
         let chart1, chart2;
 
         async function loadResults() {
@@ -194,7 +194,10 @@
             document.getElementById('results').style.display = 'none';
 
             try {
-                const response = await fetch(SCRIPT_URL);
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'GET',
+                    redirect: 'follow'
+                });
                 const result = await response.json();
 
                 if (result.success) {
@@ -203,6 +206,7 @@
                     showError('Failed to load results');
                 }
             } catch (error) {
+                console.error('Fetch error:', error);
                 showError('Error loading results. Please try again.');
             }
         }
