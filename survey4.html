@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategy Preferences Survey</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            background: linear-gradient(135deg, #009739 0%, #FCD116 50%, #CE1126 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .survey-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .flag {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: #009739;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .language-switcher {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .lang-btn {
+            padding: 8px 20px;
+            margin: 0 5px;
+            border: 2px solid #009739;
+            background: white;
+            color: #009739;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Sora', sans-serif;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .lang-btn.active {
+            background: #009739;
+            color: white;
+        }
+
+        .question {
+            margin-bottom: 30px;
+        }
+
+        .question-label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .radio-option:hover {
+            border-color: #009739;
+            background: #f0f9f4;
+        }
+
+        .radio-option input[type="radio"] {
+            margin-right: 12px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .radio-option label {
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: #009739;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+            font-family: 'Sora', sans-serif;
+        }
+
+        .submit-btn:hover {
+            background: #007a2f;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,151,57,0.3);
+        }
+
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .error-message {
+            background: #ffe0e0;
+            color: #cc0000;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #009739;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 600px) {
+            .survey-container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="survey-container">
+        <div class="header">
+            <div class="flag">🇨🇲</div>
+            <h1 data-en="Strategy Preferences Survey" data-fr="Enquête sur les Préférences Stratégiques">Strategy Preferences Survey</h1>
+            <p class="subtitle" data-en="Help us understand which strategies resonate most" data-fr="Aidez-nous à comprendre quelles stratégies résonnent le plus">Help us understand which strategies resonate most</p>
+        </div>
+
+        <div class="language-switcher">
+            <button onclick="switchLanguage('en')" class="lang-btn active" id="lang-en">English</button>
+            <button onclick="switchLanguage('fr')" class="lang-btn" id="lang-fr">Français</button>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+        
+        <form id="surveyForm">
+            <div class="question">
+                <label class="question-label" data-en="Which approach do you think is more effective?" data-fr="Quelle approche pensez-vous être la plus efficace?">
+                    Which approach do you think is more effective?
+                </label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" name="q1" value="Traditional opposition party politics" id="q1-1" required>
+                        <label for="q1-1" data-en="Traditional opposition party politics" data-fr="Politique traditionnelle des partis d'opposition">Traditional opposition party politics</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="q1" value="Organized resistance movement" id="q1-2">
+                        <label for="q1-2" data-en="Organized resistance movement" data-fr="Mouvement de résistance organisé">Organized resistance movement</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="q1" value="Diaspora pressure campaigns" id="q1-3">
+                        <label for="q1-3" data-en="Diaspora pressure campaigns" data-fr="Campagnes de pression de la diaspora">Diaspora pressure campaigns</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="q1" value="Economic boycotts/sanctions" id="q1-4">
+                        <label for="q1-4" data-en="Economic boycotts/sanctions" data-fr="Boycotts économiques/sanctions">Economic boycotts/sanctions</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="q1" value="All must work together" id="q1-5">
+                        <label for="q1-5" data-en="All must work together" data-fr="Tous doivent travailler ensemble">All must work together</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question">
+                <label class="question-label" data-en="How willing are you to take personal risk (financial, professional, legal) for Cameroon's liberation?" data-fr="Dans quelle mesure êtes-vous prêt à prendre des risques personnels (financiers, professionnels, juridiques) pour la libération du Cameroun?">
+                    How willing are you to take personal risk (financial, professional, legal) for Cameroon's liberation?
+                </label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" name="q2" value="Not willing at all" id="q2-1" required>
+                        <label for="q2-1" data-en="Not willing at all" data-fr="Pas du tout prêt">Not willing at all</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="q2" value="Low willingness" id="q2-2">
+                        <label for="q2-2" data-en="Low willingness" data-fr="Faible volonté">Low willingness</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="q2" value="Moderate willingness" id="q2-3">
+                        <label for="q2-3" data-en="Moderate willingness" data-fr="Volonté modérée">Moderate willingness</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="q2" value="High willingness" id="q2-4">
+                        <label for="q2-4" data-en="High willingness" data-fr="Haute volonté">High willingness</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="q2" value="Very high willingness - willing to sacrifice" id="q2-5">
+                        <label for="q2-5" data-en="Very high willingness - willing to sacrifice" data-fr="Très haute volonté - prêt à sacrifier">Very high willingness - willing to sacrifice</label>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" data-en="Submit Survey" data-fr="Soumettre l'enquête">Submit Survey</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p data-en="Submitting..." data-fr="Envoi en cours...">Submitting...</p>
+        </div>
+
+        <div class="success-message" id="successMessage">
+            <div class="success-icon">✅</div>
+            <h2 data-en="Thank You!" data-fr="Merci!">Thank You!</h2>
+            <p data-en="Your response has been recorded." data-fr="Votre réponse a été enregistrée.">Your response has been recorded.</p>
+        </div>
+    </div>
+
+    <script>
+        let currentLang = 'en';
+        const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+        const SURVEY_ID = 'survey4';
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+            
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('lang-' + lang).classList.add('active');
+            
+            document.querySelectorAll('[data-en]').forEach(element => {
+                const text = element.getAttribute('data-' + lang);
+                if (element.tagName === 'LABEL' || element.tagName === 'SPAN' || element.tagName === 'P' || element.tagName === 'H1' || element.tagName === 'H2') {
+                    element.textContent = text;
+                } else if (element.tagName === 'BUTTON') {
+                    element.textContent = text;
+                }
+            });
+        }
+
+        document.getElementById('surveyForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = {
+                surveyId: SURVEY_ID,
+                timestamp: new Date().toISOString(),
+                q1: formData.get('q1'),
+                q2: formData.get('q2'),
+                language: currentLang
+            };
+
+            document.getElementById('surveyForm').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('errorMessage').classList.remove('show');
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                setTimeout(() => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('successMessage').classList.add('show');
+                }, 1000);
+
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('surveyForm').style.display = 'block';
+                const errorMsg = document.getElementById('errorMessage');
+                errorMsg.textContent = currentLang === 'en' ? 
+                    'Error submitting survey. Please try again.' : 
+                    'Erreur lors de la soumission. Veuillez réessayer.';
+                errorMsg.classList.add('show');
+            }
+        });
+    </script>
+</body>
+</html>
