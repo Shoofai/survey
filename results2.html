@@ -34,6 +34,37 @@
             border-radius: 15px;
             color: white;
             flex-shrink: 0;
+            position: relative;
+        }
+        .language-switcher {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 5px;
+        }
+        .lang-btn {
+            padding: 5px 12px;
+            border: 2px solid white;
+            background: transparent;
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Sora', sans-serif;
+            font-weight: 600;
+            font-size: 0.75rem;
+            transition: all 0.3s;
+        }
+        .lang-btn.active {
+            background: white;
+            color: #009739;
+        }
+        .lang-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .lang-btn.active:hover {
+            background: white;
         }
         h1 { font-size: 1.6rem; margin-bottom: 5px; }
         .header p { font-size: 0.85rem; opacity: 0.9; }
@@ -82,13 +113,17 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🇨🇲 Resistance Gaps Survey Results</h1>
-            <p>Survey 2: What's Missing & Engagement</p>
+            <h1 data-en="Resistance Gaps Survey Results" data-fr="Résultats de l'Enquête sur les Lacunes">🇨🇲 Resistance Gaps Survey Results</h1>
+            <p data-en="Survey 2: What's Missing & Engagement" data-fr="Enquête 2 : Ce Qui Manque et Engagement">Survey 2: What's Missing & Engagement</p>
+            <div class="language-switcher">
+                <button onclick="switchLanguage('en')" class="lang-btn active" id="lang-en">EN</button>
+                <button onclick="switchLanguage('fr')" class="lang-btn" id="lang-fr">FR</button>
+            </div>
         </div>
 
         <div id="loading" class="loading">
             <div class="spinner"></div>
-            <p>Loading results...</p>
+            <p data-en="Loading results..." data-fr="Chargement des résultats...">Loading results...</p>
         </div>
 
         <div id="error" style="display:none;"></div>
@@ -97,17 +132,17 @@
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-value" id="totalResponses">0</div>
-                    <div class="stat-label">Total Responses</div>
+                    <div class="stat-label" data-en="Total Responses" data-fr="Total des Réponses">Total Responses</div>
                 </div>
             </div>
 
             <div class="charts-grid">
                 <div class="chart-container">
-                    <h2 class="chart-title">What's Missing for Effective Resistance?</h2>
+                    <h2 class="chart-title" data-en="What's Missing for Effective Resistance?" data-fr="Que Manque-t-il pour une Résistance Efficace?">What's Missing for Effective Resistance?</h2>
                     <div class="chart-wrapper"><canvas id="chart1"></canvas></div>
                 </div>
                 <div class="chart-container">
-                    <h2 class="chart-title">Current Engagement Levels</h2>
+                    <h2 class="chart-title" data-en="Current Engagement Levels" data-fr="Niveaux d'Engagement Actuels">Current Engagement Levels</h2>
                     <div class="chart-wrapper"><canvas id="chart2"></canvas></div>
                 </div>
             </div>
@@ -117,6 +152,33 @@
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbywR36kKJcmRgfAWPuIRJ_DsZ-Rcw2xhxQeot6jXjkuTO32Sq8BSftJVNkkUqvvI7h37g/exec?survey=survey2';
         let chart1, chart2;
+        let currentLang = 'en';
+
+        const translations = {
+            en: {
+                errorLoading: 'Error loading results. Please try again.',
+                failedLoad: 'Failed to load results',
+                responses: 'Responses'
+            },
+            fr: {
+                errorLoading: 'Erreur de chargement. Veuillez réessayer.',
+                failedLoad: 'Échec du chargement',
+                responses: 'Réponses'
+            }
+        };
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('lang-' + lang).classList.add('active');
+
+            document.querySelectorAll('[data-en]').forEach(element => {
+                const text = element.getAttribute('data-' + lang);
+                if (text) element.textContent = (element.tagName === 'H1' ? '🇨🇲 ' : '') + text;
+            });
+        }
 
         async function loadResults() {
             document.getElementById('loading').style.display = 'flex';
@@ -127,10 +189,10 @@
                 const response = await fetch(SCRIPT_URL, { method: 'GET', redirect: 'follow' });
                 const result = await response.json();
                 if (result.success) { displayResults(result.data); }
-                else { showError('Failed to load results'); }
+                else { showError(translations[currentLang].failedLoad); }
             } catch (error) {
                 console.error('Fetch error:', error);
-                showError('Error loading results. Please try again.');
+                showError(translations[currentLang].errorLoading);
             }
         }
 
@@ -146,7 +208,7 @@
             if (chart1) chart1.destroy();
             chart1 = new Chart(document.getElementById('chart1'), {
                 type: 'bar',
-                data: { labels: q1Labels, datasets: [{ label: 'Responses', data: q1Values, backgroundColor: '#009739' }] },
+                data: { labels: q1Labels, datasets: [{ label: translations[currentLang].responses, data: q1Values, backgroundColor: '#009739' }] },
                 options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } }, plugins: { legend: { display: false } } }
             });
 

@@ -33,6 +33,37 @@
             background: linear-gradient(135deg, #009739 0%, #FCD116 50%, #CE1126 100%);
             border-radius: 10px;
             flex-shrink: 0;
+            position: relative;
+        }
+        .language-switcher {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 5px;
+        }
+        .lang-btn {
+            padding: 5px 12px;
+            border: 2px solid white;
+            background: transparent;
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Sora', sans-serif;
+            font-weight: 600;
+            font-size: 0.75rem;
+            transition: all 0.3s;
+        }
+        .lang-btn.active {
+            background: white;
+            color: #009739;
+        }
+        .lang-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .lang-btn.active:hover {
+            background: white;
         }
         h1 { font-size: 1.4rem; margin-bottom: 2px; }
         .header p { font-size: 0.75rem; opacity: 0.9; }
@@ -160,40 +191,44 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🇨🇲 Project C - Survey Dashboard</h1>
-            <p>Live Results Overview - Auto-updates every 30 seconds</p>
+            <h1 data-en="Project C - Survey Dashboard" data-fr="Project C - Tableau de Bord">🇨🇲 Project C - Survey Dashboard</h1>
+            <p data-en="Live Results Overview - Auto-updates every 30 seconds" data-fr="Aperçu des Résultats en Direct - Mise à jour automatique toutes les 30 secondes">Live Results Overview - Auto-updates every 30 seconds</p>
+            <div class="language-switcher">
+                <button onclick="switchLanguage('en')" class="lang-btn active" id="lang-en">EN</button>
+                <button onclick="switchLanguage('fr')" class="lang-btn" id="lang-fr">FR</button>
+            </div>
         </div>
 
         <div id="loading" class="loading">
             <div class="spinner"></div>
-            <p style="margin-top: 15px;">Loading all survey results...</p>
+            <p data-en="Loading all survey results..." data-fr="Chargement de tous les résultats...">Loading all survey results...</p>
         </div>
 
         <div id="results" style="display: none;">
             <div class="main-stats">
                 <div class="stat-card">
                     <div class="stat-value" id="total1">0</div>
-                    <div class="stat-label">Survey 1</div>
+                    <div class="stat-label" data-en="Survey 1" data-fr="Enquête 1">Survey 1</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value" id="total2">0</div>
-                    <div class="stat-label">Survey 2</div>
+                    <div class="stat-label" data-en="Survey 2" data-fr="Enquête 2">Survey 2</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value" id="total3">0</div>
-                    <div class="stat-label">Survey 3</div>
+                    <div class="stat-label" data-en="Survey 3" data-fr="Enquête 3">Survey 3</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value" id="total4">0</div>
-                    <div class="stat-label">Survey 4</div>
+                    <div class="stat-label" data-en="Survey 4" data-fr="Enquête 4">Survey 4</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value" id="total5">0</div>
-                    <div class="stat-label">Survey 5</div>
+                    <div class="stat-label" data-en="Survey 5" data-fr="Enquête 5">Survey 5</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value" id="totalAll">0</div>
-                    <div class="stat-label">Total Responses</div>
+                    <div class="stat-label" data-en="Total Responses" data-fr="Total des Réponses">Total Responses</div>
                 </div>
             </div>
 
@@ -201,36 +236,36 @@
                 <div class="survey-grid">
                     <div class="survey-card">
                         <div class="survey-header">
-                            <div class="survey-title">Diaspora Profile</div>
-                            <div class="survey-subtitle">Time Outside & Optimism</div>
+                            <div class="survey-title" data-en="Diaspora Profile" data-fr="Profil Diaspora">Diaspora Profile</div>
+                            <div class="survey-subtitle" data-en="Time Outside & Optimism" data-fr="Temps à l'Étranger et Optimisme">Time Outside & Optimism</div>
                         </div>
                         <div class="chart-area"><canvas id="chart1"></canvas></div>
                     </div>
                     <div class="survey-card">
                         <div class="survey-header">
-                            <div class="survey-title">Resistance Gaps</div>
-                            <div class="survey-subtitle">What's Missing</div>
+                            <div class="survey-title" data-en="Resistance Gaps" data-fr="Lacunes de Résistance">Resistance Gaps</div>
+                            <div class="survey-subtitle" data-en="What's Missing" data-fr="Ce Qui Manque">What's Missing</div>
                         </div>
                         <div class="chart-area"><canvas id="chart2"></canvas></div>
                     </div>
                     <div class="survey-card">
                         <div class="survey-header">
-                            <div class="survey-title">Cultural Connection</div>
-                            <div class="survey-subtitle">Food & Diaspora Power</div>
+                            <div class="survey-title" data-en="Cultural Connection" data-fr="Connexion Culturelle">Cultural Connection</div>
+                            <div class="survey-subtitle" data-en="Food & Diaspora Power" data-fr="Cuisine et Pouvoir Diaspora">Food & Diaspora Power</div>
                         </div>
                         <div class="chart-area"><canvas id="chart3"></canvas></div>
                     </div>
                     <div class="survey-card">
                         <div class="survey-header">
-                            <div class="survey-title">Strategy Preferences</div>
-                            <div class="survey-subtitle">Approach & Risk</div>
+                            <div class="survey-title" data-en="Strategy Preferences" data-fr="Préférences Stratégiques">Strategy Preferences</div>
+                            <div class="survey-subtitle" data-en="Approach & Risk" data-fr="Approche et Risque">Approach & Risk</div>
                         </div>
                         <div class="chart-area"><canvas id="chart4"></canvas></div>
                     </div>
                     <div class="survey-card">
                         <div class="survey-header">
-                            <div class="survey-title">Commitment Check</div>
-                            <div class="survey-subtitle">Your Lane & Next Steps</div>
+                            <div class="survey-title" data-en="Commitment Check" data-fr="Vérification d'Engagement">Commitment Check</div>
+                            <div class="survey-subtitle" data-en="Your Lane & Next Steps" data-fr="Votre Voie et Prochaines Étapes">Your Lane & Next Steps</div>
                         </div>
                         <div class="chart-area"><canvas id="chart5"></canvas></div>
                     </div>
@@ -238,20 +273,20 @@
 
                 <div class="country-panel">
                     <div class="country-header">
-                        <div class="country-title">🌍 Responses by Country</div>
+                        <div class="country-title" data-en="Responses by Country" data-fr="Réponses par Pays">🌍 Responses by Country</div>
                     </div>
                     <div id="countryList" class="country-list">
-                        <p style="color: #888; font-size: 0.75rem; text-align: center; padding: 20px;">No country data yet</p>
+                        <p style="color: #888; font-size: 0.75rem; text-align: center; padding: 20px;" data-en="No country data yet" data-fr="Pas encore de données par pays">No country data yet</p>
                     </div>
                 </div>
             </div>
 
             <div class="nav-links">
-                <a href="results1.html" class="nav-link">Survey 1</a>
-                <a href="results2.html" class="nav-link">Survey 2</a>
-                <a href="results3.html" class="nav-link">Survey 3</a>
-                <a href="results4.html" class="nav-link">Survey 4</a>
-                <a href="results5.html" class="nav-link">Survey 5</a>
+                <a href="results1.html" class="nav-link" data-en="Survey 1" data-fr="Enquête 1">Survey 1</a>
+                <a href="results2.html" class="nav-link" data-en="Survey 2" data-fr="Enquête 2">Survey 2</a>
+                <a href="results3.html" class="nav-link" data-en="Survey 3" data-fr="Enquête 3">Survey 3</a>
+                <a href="results4.html" class="nav-link" data-en="Survey 4" data-fr="Enquête 4">Survey 4</a>
+                <a href="results5.html" class="nav-link" data-en="Survey 5" data-fr="Enquête 5">Survey 5</a>
             </div>
         </div>
     </div>
@@ -260,6 +295,37 @@
         const BASE_URL = 'https://script.google.com/macros/s/AKfycbywR36kKJcmRgfAWPuIRJ_DsZ-Rcw2xhxQeot6jXjkuTO32Sq8BSftJVNkkUqvvI7h37g/exec';
         const charts = {};
         const colors = ['#009739', '#FCD116', '#CE1126', '#0066cc', '#ff9900', '#9933cc', '#00bcd4', '#e91e63'];
+        let currentLang = 'en';
+
+        const translations = {
+            en: {
+                noCountryData: 'No country data yet'
+            },
+            fr: {
+                noCountryData: 'Pas encore de données par pays'
+            }
+        };
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('lang-' + lang).classList.add('active');
+
+            document.querySelectorAll('[data-en]').forEach(element => {
+                const text = element.getAttribute('data-' + lang);
+                if (text) {
+                    if (element.tagName === 'H1') {
+                        element.textContent = '🇨🇲 ' + text;
+                    } else if (element.classList.contains('country-title')) {
+                        element.textContent = '🌍 ' + text;
+                    } else {
+                        element.textContent = text;
+                    }
+                }
+            });
+        }
 
         async function loadAllResults() {
             document.getElementById('loading').style.display = 'flex';
@@ -343,7 +409,7 @@
             const container = document.getElementById('countryList');
 
             if (Object.keys(countries).length === 0) {
-                container.innerHTML = '<p style="color: #888; font-size: 0.75rem; text-align: center; padding: 20px;">No country data yet</p>';
+                container.innerHTML = `<p style="color: #888; font-size: 0.75rem; text-align: center; padding: 20px;">${translations[currentLang].noCountryData}</p>`;
                 return;
             }
 

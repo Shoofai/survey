@@ -33,6 +33,37 @@
             border-radius: 15px;
             color: white;
             flex-shrink: 0;
+            position: relative;
+        }
+        .language-switcher {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 5px;
+        }
+        .lang-btn {
+            padding: 5px 12px;
+            border: 2px solid white;
+            background: transparent;
+            color: white;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Sora', sans-serif;
+            font-weight: 600;
+            font-size: 0.75rem;
+            transition: all 0.3s;
+        }
+        .lang-btn.active {
+            background: white;
+            color: #009739;
+        }
+        .lang-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        .lang-btn.active:hover {
+            background: white;
         }
         h1 { font-size: 1.6rem; margin-bottom: 5px; }
         .header p { font-size: 0.85rem; opacity: 0.9; }
@@ -92,13 +123,17 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🇨🇲 Cultural Connection Survey Results</h1>
-            <p>Survey 3: Food & Diaspora Power</p>
+            <h1 data-en="Cultural Connection Survey Results" data-fr="Résultats de l'Enquête Connexion Culturelle">🇨🇲 Cultural Connection Survey Results</h1>
+            <p data-en="Survey 3: Food & Diaspora Power" data-fr="Enquête 3 : Cuisine et Pouvoir de la Diaspora">Survey 3: Food & Diaspora Power</p>
+            <div class="language-switcher">
+                <button onclick="switchLanguage('en')" class="lang-btn active" id="lang-en">EN</button>
+                <button onclick="switchLanguage('fr')" class="lang-btn" id="lang-fr">FR</button>
+            </div>
         </div>
 
         <div id="loading" class="loading">
             <div class="spinner"></div>
-            <p>Loading results...</p>
+            <p data-en="Loading results..." data-fr="Chargement des résultats...">Loading results...</p>
         </div>
 
         <div id="error" style="display:none;"></div>
@@ -107,17 +142,17 @@
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-value" id="totalResponses">0</div>
-                    <div class="stat-label">Total Responses</div>
+                    <div class="stat-label" data-en="Total Responses" data-fr="Total des Réponses">Total Responses</div>
                 </div>
             </div>
 
             <div class="content-grid">
                 <div class="content-container">
-                    <h2 class="content-title">Favorite Dishes</h2>
+                    <h2 class="content-title" data-en="Favorite Dishes" data-fr="Plats Préférés">Favorite Dishes</h2>
                     <div id="dishList" class="dish-list"></div>
                 </div>
                 <div class="content-container">
-                    <h2 class="content-title">Thoughts on Diaspora Power (Recent)</h2>
+                    <h2 class="content-title" data-en="Thoughts on Diaspora Power (Recent)" data-fr="Réflexions sur le Pouvoir de la Diaspora (Récentes)">Thoughts on Diaspora Power (Recent)</h2>
                     <div id="responsesList" class="responses-list"></div>
                 </div>
             </div>
@@ -126,6 +161,35 @@
 
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbywR36kKJcmRgfAWPuIRJ_DsZ-Rcw2xhxQeot6jXjkuTO32Sq8BSftJVNkkUqvvI7h37g/exec?survey=survey3';
+        let currentLang = 'en';
+
+        const translations = {
+            en: {
+                errorLoading: 'Error loading results. Please try again.',
+                vote: 'vote',
+                votes: 'votes',
+                favorite: 'Favorite'
+            },
+            fr: {
+                errorLoading: 'Erreur de chargement. Veuillez réessayer.',
+                vote: 'vote',
+                votes: 'votes',
+                favorite: 'Favori'
+            }
+        };
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('lang-' + lang).classList.add('active');
+
+            document.querySelectorAll('[data-en]').forEach(element => {
+                const text = element.getAttribute('data-' + lang);
+                if (text) element.textContent = (element.tagName === 'H1' ? '🇨🇲 ' : '') + text;
+            });
+        }
 
         async function loadResults() {
             document.getElementById('loading').style.display = 'flex';
@@ -149,7 +213,8 @@
             const dishList = document.getElementById('dishList');
             dishList.innerHTML = '';
             Object.entries(data.q1Data).forEach(([dish, count]) => {
-                dishList.innerHTML += `<div class="dish-item"><strong>${dish}</strong><br><small>${count} vote${count > 1 ? 's' : ''}</small></div>`;
+                const voteText = count > 1 ? translations[currentLang].votes : translations[currentLang].vote;
+                dishList.innerHTML += `<div class="dish-item"><strong>${dish}</strong><br><small>${count} ${voteText}</small></div>`;
             });
 
             const responsesList = document.getElementById('responsesList');
@@ -157,7 +222,7 @@
             data.recentResponses.slice(0, 5).forEach(response => {
                 if (response[2]) {
                     const text = response[2].length > 150 ? response[2].substring(0, 150) + '...' : response[2];
-                    responsesList.innerHTML += `<div class="response-item"><div class="response-text">"${text}"</div><div class="response-meta">Favorite: ${response[1]}</div></div>`;
+                    responsesList.innerHTML += `<div class="response-item"><div class="response-text">"${text}"</div><div class="response-meta">${translations[currentLang].favorite}: ${response[1]}</div></div>`;
                 }
             });
         }
