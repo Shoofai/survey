@@ -102,6 +102,23 @@
             border-color: #009739;
         }
 
+        select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-family: 'Sora', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            background: white;
+            cursor: pointer;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #009739;
+        }
+
         textarea {
             width: 100%;
             padding: 15px;
@@ -233,10 +250,30 @@
                 <label class="question-label" for="q1" data-en="What's your go-to Cameroonian dish you miss most?" data-fr="Quel plat camerounais vous manque le plus?">
                     What's your go-to Cameroonian dish you miss most?
                 </label>
-                <input type="text" id="q1" name="q1" required 
-                       data-placeholder-en="e.g., Ndolé, Eru, Koki, Achu..." 
-                       data-placeholder-fr="par ex., Ndolé, Eru, Koki, Achu..." 
-                       placeholder="e.g., Ndolé, Eru, Koki, Achu...">
+                <select id="q1" name="q1" required>
+                    <option value="" data-en="-- Select a dish --" data-fr="-- Choisir un plat --">-- Select a dish --</option>
+                    <option value="Ndolé">Ndolé</option>
+                    <option value="Eru">Eru</option>
+                    <option value="Koki">Koki</option>
+                    <option value="Achu">Achu</option>
+                    <option value="Mbongo Tchobi">Mbongo Tchobi</option>
+                    <option value="Poulet DG">Poulet DG</option>
+                    <option value="Kondré">Kondré</option>
+                    <option value="Sanga">Sanga</option>
+                    <option value="Okok">Okok</option>
+                    <option value="Egusi Soup">Egusi Soup</option>
+                    <option value="Nkui">Nkui</option>
+                    <option value="Ekwang">Ekwang</option>
+                    <option value="Fufu Corn">Fufu Corn</option>
+                    <option value="Water Fufu & Njama Njama">Water Fufu & Njama Njama</option>
+                    <option value="Bobolo">Bobolo</option>
+                    <option value="Miondo">Miondo</option>
+                    <option value="Puff Puff">Puff Puff</option>
+                    <option value="Accra Banana">Accra Banana</option>
+                    <option value="Kpem">Kpem</option>
+                    <option value="Pilé">Pilé</option>
+                    <option value="Other" data-en="Other (specify in comments)" data-fr="Autre (préciser dans les commentaires)">Other (specify in comments)</option>
+                </select>
             </div>
 
             <div class="question">
@@ -296,8 +333,12 @@
             });
 
             // Update placeholders
-            document.getElementById('q1').placeholder = document.getElementById('q1').getAttribute('data-placeholder-' + lang);
             document.getElementById('q2').placeholder = document.getElementById('q2').getAttribute('data-placeholder-' + lang);
+
+            // Update select options
+            document.querySelectorAll('select option[data-en]').forEach(option => {
+                option.textContent = option.getAttribute('data-' + lang);
+            });
         }
 
         // Character counter

@@ -8,32 +8,28 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; overflow: hidden; }
+        html, body { height: 100%; overflow-x: hidden; }
         body {
             font-family: 'Sora', sans-serif;
             background: #1a1a2e;
             color: #fff;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
+            min-height: 100vh;
         }
         .container {
-            flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 12px;
+            padding: 15px;
             max-width: 1600px;
             margin: 0 auto;
             width: 100%;
-            height: 100%;
         }
         .header {
             text-align: center;
-            padding: 10px 20px;
+            padding: 12px 20px;
             background: linear-gradient(135deg, #009739 0%, #FCD116 50%, #CE1126 100%);
             border-radius: 10px;
-            flex-shrink: 0;
             position: relative;
+            margin-bottom: 15px;
         }
         .language-switcher {
             position: absolute;
@@ -65,127 +61,144 @@
         .lang-btn.active:hover {
             background: white;
         }
-        h1 { font-size: 1.4rem; margin-bottom: 2px; }
-        .header p { font-size: 0.75rem; opacity: 0.9; }
+        h1 { font-size: 1.5rem; margin-bottom: 3px; }
+        .header p { font-size: 0.8rem; opacity: 0.9; }
         .main-stats {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
-            gap: 10px;
-            margin: 10px 0;
-            flex-shrink: 0;
+            gap: 12px;
+            margin-bottom: 20px;
         }
         .stat-card {
             background: linear-gradient(145deg, #16213e 0%, #1a1a2e 100%);
-            padding: 10px;
-            border-radius: 8px;
+            padding: 15px 10px;
+            border-radius: 10px;
             text-align: center;
             border: 1px solid #2a2a4a;
         }
-        .stat-card.wide { grid-column: span 1; }
-        .stat-value { font-size: 1.5rem; font-weight: 700; color: #009739; }
-        .stat-label { color: #888; font-size: 0.65rem; margin-top: 2px; }
-        .content-grid {
+        .stat-value { font-size: 1.8rem; font-weight: 700; color: #009739; }
+        .stat-label { color: #888; font-size: 0.7rem; margin-top: 3px; line-height: 1.2; }
+        .content-wrapper {
             display: grid;
             grid-template-columns: 1fr 280px;
-            gap: 10px;
-            flex: 1;
-            min-height: 0;
+            gap: 15px;
         }
         .survey-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-            min-height: 0;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
         }
         .survey-card {
             background: linear-gradient(145deg, #16213e 0%, #1a1a2e 100%);
-            border-radius: 8px;
+            border-radius: 10px;
             border: 1px solid #2a2a4a;
             display: flex;
             flex-direction: column;
-            min-height: 0;
-            overflow: hidden;
+            min-height: 280px;
         }
         .survey-header {
-            padding: 8px;
+            padding: 12px 15px;
             border-bottom: 1px solid #2a2a4a;
-            flex-shrink: 0;
         }
-        .survey-title { font-size: 0.75rem; font-weight: 700; color: #FCD116; margin-bottom: 2px; }
-        .survey-subtitle { font-size: 0.6rem; color: #888; }
+        .survey-title { font-size: 0.95rem; font-weight: 700; color: #FCD116; margin-bottom: 3px; }
+        .survey-subtitle { font-size: 0.75rem; color: #888; }
         .chart-area {
             flex: 1;
-            padding: 6px;
-            min-height: 0;
+            padding: 15px;
             position: relative;
+            min-height: 200px;
         }
         .chart-area canvas {
             position: absolute;
-            top: 6px;
-            left: 6px;
-            right: 6px;
-            bottom: 6px;
-            width: calc(100% - 12px) !important;
-            height: calc(100% - 12px) !important;
+            top: 15px;
+            left: 15px;
+            right: 15px;
+            bottom: 15px;
+            width: calc(100% - 30px) !important;
+            height: calc(100% - 30px) !important;
         }
         .country-panel {
             background: linear-gradient(145deg, #16213e 0%, #1a1a2e 100%);
-            border-radius: 8px;
+            border-radius: 10px;
             border: 1px solid #2a2a4a;
             display: flex;
             flex-direction: column;
-            min-height: 0;
-            overflow: hidden;
+            max-height: 600px;
         }
         .country-header {
-            padding: 10px;
+            padding: 12px 15px;
             border-bottom: 1px solid #2a2a4a;
-            flex-shrink: 0;
         }
-        .country-title { font-size: 0.85rem; font-weight: 700; color: #FCD116; }
+        .country-title { font-size: 0.95rem; font-weight: 700; color: #FCD116; }
         .country-list {
             flex: 1;
             overflow-y: auto;
-            padding: 8px;
+            padding: 10px;
         }
         .country-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 6px 8px;
+            padding: 8px 10px;
             background: #2a2a4a;
             border-radius: 6px;
-            margin-bottom: 6px;
-            font-size: 0.75rem;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
         }
         .country-name { color: #fff; }
         .country-count { color: #009739; font-weight: 700; }
         .country-bar {
-            height: 3px;
+            height: 4px;
             background: #009739;
             border-radius: 2px;
             margin-top: 4px;
+            margin-bottom: 8px;
         }
-        .loading { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; }
+        .loading { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px; }
         .spinner { border: 4px solid #2a2a4a; border-top: 4px solid #009739; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .nav-links {
             display: flex;
             justify-content: center;
-            gap: 8px;
-            margin-top: 8px;
-            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+            padding-bottom: 20px;
         }
         .nav-link {
-            padding: 5px 12px;
+            padding: 8px 16px;
             background: #2a2a4a;
             color: #fff;
             text-decoration: none;
-            border-radius: 15px;
-            font-size: 0.7rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
             transition: all 0.3s;
         }
         .nav-link:hover { background: #009739; }
+        @media (max-width: 1200px) {
+            .content-wrapper {
+                grid-template-columns: 1fr;
+            }
+            .country-panel {
+                max-height: 300px;
+            }
+        }
+        @media (max-width: 900px) {
+            .survey-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .main-stats {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        @media (max-width: 600px) {
+            .survey-grid {
+                grid-template-columns: 1fr;
+            }
+            .main-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
     </style>
 </head>
 <body>
@@ -208,57 +221,57 @@
             <div class="main-stats">
                 <div class="stat-card">
                     <div class="stat-value" id="total1">0</div>
-                    <div class="stat-label" data-en="Survey 1" data-fr="Enquête 1">Survey 1</div>
+                    <div class="stat-label" data-en="Diaspora Profile" data-fr="Profil Diaspora">Diaspora Profile</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value" id="total2">0</div>
-                    <div class="stat-label" data-en="Survey 2" data-fr="Enquête 2">Survey 2</div>
+                    <div class="stat-label" data-en="Resistance Gaps" data-fr="Lacunes Résistance">Resistance Gaps</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value" id="total3">0</div>
-                    <div class="stat-label" data-en="Survey 3" data-fr="Enquête 3">Survey 3</div>
+                    <div class="stat-label" data-en="Cultural Connection" data-fr="Connexion Culturelle">Cultural Connection</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value" id="total4">0</div>
-                    <div class="stat-label" data-en="Survey 4" data-fr="Enquête 4">Survey 4</div>
+                    <div class="stat-label" data-en="Strategy Preferences" data-fr="Préférences Stratégiques">Strategy Preferences</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value" id="total5">0</div>
-                    <div class="stat-label" data-en="Survey 5" data-fr="Enquête 5">Survey 5</div>
+                    <div class="stat-label" data-en="Commitment Check" data-fr="Vérif. Engagement">Commitment Check</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value" id="totalAll">0</div>
-                    <div class="stat-label" data-en="Total Responses" data-fr="Total des Réponses">Total Responses</div>
+                    <div class="stat-label" data-en="Total Responses" data-fr="Total Réponses">Total Responses</div>
                 </div>
             </div>
 
-            <div class="content-grid">
+            <div class="content-wrapper">
                 <div class="survey-grid">
                     <div class="survey-card">
                         <div class="survey-header">
                             <div class="survey-title" data-en="Diaspora Profile" data-fr="Profil Diaspora">Diaspora Profile</div>
-                            <div class="survey-subtitle" data-en="Time Outside & Optimism" data-fr="Temps à l'Étranger et Optimisme">Time Outside & Optimism</div>
+                            <div class="survey-subtitle" data-en="Time Outside Cameroon & Optimism Level" data-fr="Temps Hors du Cameroun et Niveau d'Optimisme">Time Outside Cameroon & Optimism Level</div>
                         </div>
                         <div class="chart-area"><canvas id="chart1"></canvas></div>
                     </div>
                     <div class="survey-card">
                         <div class="survey-header">
                             <div class="survey-title" data-en="Resistance Gaps" data-fr="Lacunes de Résistance">Resistance Gaps</div>
-                            <div class="survey-subtitle" data-en="What's Missing" data-fr="Ce Qui Manque">What's Missing</div>
+                            <div class="survey-subtitle" data-en="What's Missing & Engagement Levels" data-fr="Ce Qui Manque et Niveaux d'Engagement">What's Missing & Engagement Levels</div>
                         </div>
                         <div class="chart-area"><canvas id="chart2"></canvas></div>
                     </div>
                     <div class="survey-card">
                         <div class="survey-header">
                             <div class="survey-title" data-en="Cultural Connection" data-fr="Connexion Culturelle">Cultural Connection</div>
-                            <div class="survey-subtitle" data-en="Food & Diaspora Power" data-fr="Cuisine et Pouvoir Diaspora">Food & Diaspora Power</div>
+                            <div class="survey-subtitle" data-en="Favorite Dishes & Diaspora Power" data-fr="Plats Préférés et Pouvoir Diaspora">Favorite Dishes & Diaspora Power</div>
                         </div>
                         <div class="chart-area"><canvas id="chart3"></canvas></div>
                     </div>
                     <div class="survey-card">
                         <div class="survey-header">
                             <div class="survey-title" data-en="Strategy Preferences" data-fr="Préférences Stratégiques">Strategy Preferences</div>
-                            <div class="survey-subtitle" data-en="Approach & Risk" data-fr="Approche et Risque">Approach & Risk</div>
+                            <div class="survey-subtitle" data-en="Effective Approach & Risk Willingness" data-fr="Approche Efficace et Volonté de Risque">Effective Approach & Risk Willingness</div>
                         </div>
                         <div class="chart-area"><canvas id="chart4"></canvas></div>
                     </div>
@@ -276,17 +289,17 @@
                         <div class="country-title" data-en="Responses by Country" data-fr="Réponses par Pays">🌍 Responses by Country</div>
                     </div>
                     <div id="countryList" class="country-list">
-                        <p style="color: #888; font-size: 0.75rem; text-align: center; padding: 20px;" data-en="No country data yet" data-fr="Pas encore de données par pays">No country data yet</p>
+                        <p style="color: #888; font-size: 0.8rem; text-align: center; padding: 20px;" data-en="No country data yet" data-fr="Pas encore de données par pays">No country data yet</p>
                     </div>
                 </div>
             </div>
 
             <div class="nav-links">
-                <a href="results1.html" class="nav-link" data-en="Survey 1" data-fr="Enquête 1">Survey 1</a>
-                <a href="results2.html" class="nav-link" data-en="Survey 2" data-fr="Enquête 2">Survey 2</a>
-                <a href="results3.html" class="nav-link" data-en="Survey 3" data-fr="Enquête 3">Survey 3</a>
-                <a href="results4.html" class="nav-link" data-en="Survey 4" data-fr="Enquête 4">Survey 4</a>
-                <a href="results5.html" class="nav-link" data-en="Survey 5" data-fr="Enquête 5">Survey 5</a>
+                <a href="results1.html" class="nav-link" data-en="Diaspora Profile" data-fr="Profil Diaspora">Diaspora Profile</a>
+                <a href="results2.html" class="nav-link" data-en="Resistance Gaps" data-fr="Lacunes Résistance">Resistance Gaps</a>
+                <a href="results3.html" class="nav-link" data-en="Cultural Connection" data-fr="Connexion Culturelle">Cultural Connection</a>
+                <a href="results4.html" class="nav-link" data-en="Strategy Preferences" data-fr="Préférences Stratégiques">Strategy Preferences</a>
+                <a href="results5.html" class="nav-link" data-en="Commitment Check" data-fr="Vérif. Engagement">Commitment Check</a>
             </div>
         </div>
     </div>
@@ -341,8 +354,7 @@
                 ]);
 
                 document.getElementById('loading').style.display = 'none';
-                document.getElementById('results').style.display = 'flex';
-                document.getElementById('results').style.flexDirection = 'column';
+                document.getElementById('results').style.display = 'block';
 
                 // Aggregate country data across all surveys
                 const allCountries = {};
@@ -395,9 +407,9 @@
                             position: 'bottom',
                             labels: {
                                 color: '#888',
-                                font: { size: 8 },
-                                boxWidth: 8,
-                                padding: 4
+                                font: { size: 10 },
+                                boxWidth: 12,
+                                padding: 8
                             }
                         }
                     }
@@ -409,7 +421,7 @@
             const container = document.getElementById('countryList');
 
             if (Object.keys(countries).length === 0) {
-                container.innerHTML = `<p style="color: #888; font-size: 0.75rem; text-align: center; padding: 20px;">${translations[currentLang].noCountryData}</p>`;
+                container.innerHTML = `<p style="color: #888; font-size: 0.8rem; text-align: center; padding: 20px;">${translations[currentLang].noCountryData}</p>`;
                 return;
             }
 
