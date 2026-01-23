@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategic Framework Proposal - Vote</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            background: linear-gradient(135deg, #009739 0%, #FCD116 50%, #CE1126 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .vote-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #FCD116;
+        }
+
+        .flag {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: #009739;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            font-weight: 800;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .language-switcher {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .lang-btn {
+            padding: 8px 20px;
+            margin: 0 5px;
+            border: 2px solid #009739;
+            background: white;
+            color: #009739;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Sora', sans-serif;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .lang-btn.active {
+            background: #009739;
+            color: white;
+        }
+
+        .context-box {
+            background: #f0f9f4;
+            border-left: 4px solid #009739;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .context-box strong {
+            color: #009739;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .identity-section {
+            background: #fff9e6;
+            border: 2px solid #FCD116;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+        }
+
+        .identity-title {
+            color: #CE1126;
+            font-weight: 700;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        input[type="text"],
+        input[type="email"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-family: 'Sora', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus {
+            outline: none;
+            border-color: #009739;
+        }
+
+        .question-section {
+            margin-bottom: 30px;
+        }
+
+        .question-number {
+            display: inline-block;
+            background: #009739;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: 700;
+            margin-right: 10px;
+        }
+
+        .question-text {
+            color: #333;
+            font-weight: 600;
+            font-size: 1.05rem;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .vote-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .vote-option {
+            position: relative;
+        }
+
+        .vote-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .vote-label {
+            display: block;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.1rem;
+        }
+
+        .vote-option input[type="radio"]:checked + .vote-label {
+            background: #009739;
+            color: white;
+            border-color: #009739;
+        }
+
+        .vote-label.yes {
+            color: #009739;
+        }
+
+        .vote-label.no {
+            color: #CE1126;
+        }
+
+        .vote-option input[type="radio"]:checked + .vote-label.yes {
+            background: #009739;
+            color: white;
+        }
+
+        .vote-option input[type="radio"]:checked + .vote-label.no {
+            background: #CE1126;
+            color: white;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: #009739;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 30px;
+            font-family: 'Sora', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .submit-btn:hover {
+            background: #007a2f;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,151,57,0.3);
+        }
+
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .success-icon {
+            font-size: 5rem;
+            margin-bottom: 20px;
+        }
+
+        .success-message h2 {
+            color: #009739;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        .error-message {
+            background: #ffe0e0;
+            color: #cc0000;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            font-weight: 600;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #009739;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .note {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .vote-container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .vote-options {
+                grid-template-columns: 1fr;
+            }
+
+            .question-text {
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="vote-container">
+        <div class="header">
+            <div class="flag">🇨🇲</div>
+            <h1 data-en="Strategic Framework Proposal - Official Vote" data-fr="Proposition de Cadre Stratégique - Vote Officiel">Strategic Framework Proposal - Official Vote</h1>
+            <p class="subtitle" data-en="Formal decision on next steps" data-fr="Décision formelle sur les prochaines étapes">Formal decision on next steps</p>
+        </div>
+
+        <div class="language-switcher">
+            <button onclick="switchLanguage('en')" class="lang-btn active" id="lang-en">English</button>
+            <button onclick="switchLanguage('fr')" class="lang-btn" id="lang-fr">Français</button>
+        </div>
+
+        <div class="context-box">
+            <strong data-en="Context:" data-fr="Contexte :">Context:</strong>
+            <p data-en="For nearly four weeks, we have continued this debate without formally recording a decision. The moment demands clarity. To bring this matter to responsible closure—and so history can record that we addressed it deliberately and in good faith—we propose a simple vote focused on process, not ideology." data-fr="Depuis près de quatre semaines, nous poursuivons ce débat sans enregistrer formellement une décision. Le moment exige de la clarté. Pour clore cette question de manière responsable—et afin que l'histoire puisse enregistrer que nous l'avons abordée délibérément et de bonne foi—nous proposons un vote simple axé sur le processus, et non sur l'idéologie.">
+                For nearly four weeks, we have continued this debate without formally recording a decision. The moment demands clarity. To bring this matter to responsible closure—and so history can record that we addressed it deliberately and in good faith—we propose a simple vote focused on process, not ideology.
+            </p>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+        
+        <form id="voteForm">
+            <div class="identity-section">
+                <div class="identity-title" data-en="🔒 Your Identity (Required for Official Record)" data-fr="🔒 Votre Identité (Requise pour le Registre Officiel)">🔒 Your Identity (Required for Official Record)</div>
+                <div class="input-group">
+                    <label class="input-label" for="voterName" data-en="Full Name *" data-fr="Nom Complet *">Full Name *</label>
+                    <input type="text" id="voterName" name="voterName" required 
+                           data-placeholder-en="Enter your full name" 
+                           data-placeholder-fr="Entrez votre nom complet"
+                           placeholder="Enter your full name">
+                </div>
+                <div class="input-group">
+                    <label class="input-label" for="voterEmail" data-en="Email Address *" data-fr="Adresse Email *">Email Address *</label>
+                    <input type="email" id="voterEmail" name="voterEmail" required 
+                           data-placeholder-en="Enter your email address" 
+                           data-placeholder-fr="Entrez votre adresse email"
+                           placeholder="Enter your email address">
+                </div>
+                <p class="note" data-en="Note: Each email can only vote once. Your identity will be recorded for transparency." data-fr="Note : Chaque email ne peut voter qu'une seule fois. Votre identité sera enregistrée pour la transparence.">
+                    Note: Each email can only vote once. Your identity will be recorded for transparency.
+                </p>
+            </div>
+
+            <div class="question-section">
+                <div class="question-text">
+                    <span class="question-number">1</span>
+                    <span data-en="Do we agree on a shared minimum objective for the next 6-12 months?" data-fr="Sommes-nous d'accord sur un objectif minimum partagé pour les 6-12 prochains mois ?">
+                        Do we agree on a shared minimum objective for the next 6-12 months?
+                    </span>
+                </div>
+                <div class="vote-options">
+                    <div class="vote-option">
+                        <input type="radio" name="q1" value="Yes" id="q1-yes" required>
+                        <label for="q1-yes" class="vote-label yes" data-en="Yes" data-fr="Oui">Yes</label>
+                    </div>
+                    <div class="vote-option">
+                        <input type="radio" name="q1" value="No" id="q1-no">
+                        <label for="q1-no" class="vote-label no" data-en="No" data-fr="Non">No</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-section">
+                <div class="question-text">
+                    <span class="question-number">2</span>
+                    <span data-en="Do we agree to establish a temporary coordination structure to facilitate alignment?" data-fr="Sommes-nous d'accord pour établir une structure de coordination temporaire pour faciliter l'alignement ?">
+                        Do we agree to establish a temporary coordination structure to facilitate alignment?
+                    </span>
+                </div>
+                <div class="vote-options">
+                    <div class="vote-option">
+                        <input type="radio" name="q2" value="Yes" id="q2-yes" required>
+                        <label for="q2-yes" class="vote-label yes" data-en="Yes" data-fr="Oui">Yes</label>
+                    </div>
+                    <div class="vote-option">
+                        <input type="radio" name="q2" value="No" id="q2-no">
+                        <label for="q2-no" class="vote-label no" data-en="No" data-fr="Non">No</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-section">
+                <div class="question-text">
+                    <span class="question-number">3</span>
+                    <span data-en="Do we agree to seek consensus, and establish a governing framework that can be reviewed and optimized on a scheduled basis?" data-fr="Sommes-nous d'accord pour rechercher le consensus et établir un cadre de gouvernance qui peut être révisé et optimisé de manière planifiée ?">
+                        Do we agree to seek consensus, and establish a governing framework that can be reviewed and optimized on a scheduled basis?
+                    </span>
+                </div>
+                <div class="vote-options">
+                    <div class="vote-option">
+                        <input type="radio" name="q3" value="Yes" id="q3-yes" required>
+                        <label for="q3-yes" class="vote-label yes" data-en="Yes" data-fr="Oui">Yes</label>
+                    </div>
+                    <div class="vote-option">
+                        <input type="radio" name="q3" value="No" id="q3-no">
+                        <label for="q3-no" class="vote-label no" data-en="No" data-fr="Non">No</label>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" data-en="Cast My Vote" data-fr="Soumettre Mon Vote">Cast My Vote</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p data-en="Submitting your vote..." data-fr="Envoi de votre vote...">Submitting your vote...</p>
+        </div>
+
+        <div class="success-message" id="successMessage">
+            <div class="success-icon">✅</div>
+            <h2 data-en="Vote Recorded" data-fr="Vote Enregistré">Vote Recorded</h2>
+            <p data-en="Your vote has been officially recorded. Thank you for participating in this important decision." data-fr="Votre vote a été officiellement enregistré. Merci de participer à cette décision importante.">
+                Your vote has been officially recorded. Thank you for participating in this important decision.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        let currentLang = 'en';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby1fJkzaKLMuj_Gq7qXYigQR89UIyawORPueVvT8HClwGVsUGN5YtJkNiWFjvoNmWHqQw/exec';
+        const VOTE_ID = 'strategic_framework_vote';
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+            
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('lang-' + lang).classList.add('active');
+            
+            document.querySelectorAll('[data-en]').forEach(element => {
+                const text = element.getAttribute('data-' + lang);
+                if (element.tagName === 'LABEL' || element.tagName === 'SPAN' || element.tagName === 'P' || element.tagName === 'H1' || element.tagName === 'H2' || element.tagName === 'STRONG') {
+                    element.textContent = text;
+                } else if (element.tagName === 'BUTTON') {
+                    element.textContent = text;
+                }
+            });
+
+            // Update placeholders
+            document.getElementById('voterName').placeholder = document.getElementById('voterName').getAttribute('data-placeholder-' + lang);
+            document.getElementById('voterEmail').placeholder = document.getElementById('voterEmail').getAttribute('data-placeholder-' + lang);
+        }
+
+        document.getElementById('voteForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = {
+                voteId: VOTE_ID,
+                timestamp: new Date().toISOString(),
+                voterName: formData.get('voterName').trim(),
+                voterEmail: formData.get('voterEmail').trim().toLowerCase(),
+                q1: formData.get('q1'),
+                q2: formData.get('q2'),
+                q3: formData.get('q3'),
+                language: currentLang
+            };
+
+            // Basic validation
+            if (!data.voterName || data.voterName.length < 3) {
+                showError(currentLang === 'en' ? 
+                    'Please enter your full name.' : 
+                    'Veuillez entrer votre nom complet.');
+                return;
+            }
+
+            if (!data.voterEmail || !data.voterEmail.includes('@')) {
+                showError(currentLang === 'en' ? 
+                    'Please enter a valid email address.' : 
+                    'Veuillez entrer une adresse email valide.');
+                return;
+            }
+
+            document.getElementById('voteForm').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('errorMessage').classList.remove('show');
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                // With no-cors, we can't check response status
+                setTimeout(() => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('successMessage').classList.add('show');
+                }, 1500);
+
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('voteForm').style.display = 'block';
+                showError(currentLang === 'en' ? 
+                    'Error submitting vote. Please try again or contact support if the issue persists.' : 
+                    'Erreur lors de la soumission du vote. Veuillez réessayer ou contacter le support si le problème persiste.');
+            }
+        });
+
+        function showError(message) {
+            const errorMsg = document.getElementById('errorMessage');
+            errorMsg.textContent = message;
+            errorMsg.classList.add('show');
+            setTimeout(() => {
+                errorMsg.classList.remove('show');
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
