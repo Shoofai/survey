@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Voting</title>
+</head>
+<body>
+    <h1>Test Vote</h1>
+    <button onclick="testVote()">Submit Test Vote</button>
+    <div id="result"></div>
+    
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzN1EVKRdBTIJuAFMsAtjNBfNKvjX21VpfJhP8NJ9y5mmklfrfABbmOQPvggzTcTo2H1g/exec';
+        
+        async function testVote() {
+            const data = {
+                voteId: 'strategic_framework_vote',
+                timestamp: new Date().toISOString(),
+                voterName: 'Test User',
+                voterEmail: 'test' + Date.now() + '@example.com',
+                q1: 'Yes',
+                q2: 'Yes',
+                q3: 'No',
+                language: 'en'
+            };
+            
+            document.getElementById('result').innerHTML = 'Sending...';
+            console.log('Sending to:', SCRIPT_URL);
+            console.log('Data:', data);
+            
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                    redirect: 'follow'
+                });
+                
+                console.log('Response status:', response.status);
+                const text = await response.text();
+                console.log('Response text:', text);
+                
+                document.getElementById('result').innerHTML = 'SUCCESS! Check your Google Sheet StrategicVote tab.<br>Response: ' + text;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
