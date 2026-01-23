@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diaspora Profile Survey</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            background: linear-gradient(135deg, #009739 0%, #FCD116 50%, #CE1126 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .survey-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .flag {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: #009739;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .language-switcher {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .lang-btn {
+            padding: 8px 20px;
+            margin: 0 5px;
+            border: 2px solid #009739;
+            background: white;
+            color: #009739;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Sora', sans-serif;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .lang-btn.active {
+            background: #009739;
+            color: white;
+        }
+
+        .question {
+            margin-bottom: 30px;
+        }
+
+        .question-label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .radio-option:hover {
+            border-color: #009739;
+            background: #f0f9f4;
+        }
+
+        .radio-option input[type="radio"] {
+            margin-right: 12px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .radio-option label {
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .scale-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .scale-option {
+            text-align: center;
+        }
+
+        .scale-option input[type="radio"] {
+            display: none;
+        }
+
+        .scale-label {
+            display: block;
+            padding: 15px 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .scale-option input[type="radio"]:checked + .scale-label {
+            background: #009739;
+            color: white;
+            border-color: #009739;
+        }
+
+        .scale-label:hover {
+            border-color: #009739;
+            background: #f0f9f4;
+        }
+
+        .scale-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: #009739;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+            font-family: 'Sora', sans-serif;
+        }
+
+        .submit-btn:hover {
+            background: #007a2f;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,151,57,0.3);
+        }
+
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .error-message {
+            background: #ffe0e0;
+            color: #cc0000;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #009739;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 600px) {
+            .survey-container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .scale-container {
+                grid-template-columns: repeat(5, 1fr);
+                gap: 5px;
+            }
+
+            .scale-label {
+                padding: 12px 5px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="survey-container">
+        <div class="header">
+            <div class="flag">🇨🇲</div>
+            <h1 data-en="Diaspora Profile Survey" data-fr="Enquête sur le Profil de la Diaspora">Diaspora Profile Survey</h1>
+            <p class="subtitle" data-en="Help us understand our diaspora community" data-fr="Aidez-nous à comprendre notre communauté diaspora">Help us understand our diaspora community</p>
+        </div>
+
+        <div class="language-switcher">
+            <button onclick="switchLanguage('en')" class="lang-btn active" id="lang-en">English</button>
+            <button onclick="switchLanguage('fr')" class="lang-btn" id="lang-fr">Français</button>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+        
+        <form id="surveyForm">
+            <div class="question">
+                <label class="question-label" data-en="How long have you been outside Cameroon?" data-fr="Depuis combien de temps êtes-vous hors du Cameroun?">
+                    How long have you been outside Cameroon?
+                </label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" name="q1" value="Never left" id="q1-1" required>
+                        <label for="q1-1" data-en="Never left" data-fr="Jamais parti(e)">Never left</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="q1" value="Less than 5 years" id="q1-2">
+                        <label for="q1-2" data-en="Less than 5 years" data-fr="Moins de 5 ans">Less than 5 years</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="q1" value="5-10 years" id="q1-3">
+                        <label for="q1-3" data-en="5-10 years" data-fr="5-10 ans">5-10 years</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="q1" value="10-20 years" id="q1-4">
+                        <label for="q1-4" data-en="10-20 years" data-fr="10-20 ans">10-20 years</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="q1" value="20+ years" id="q1-5">
+                        <label for="q1-5" data-en="20+ years" data-fr="Plus de 20 ans">20+ years</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question">
+                <label class="question-label" data-en="On a scale of 1-10, how optimistic are you that Cameroon will see democratic change in the next 5 years?" data-fr="Sur une échelle de 1 à 10, êtes-vous optimiste que le Cameroun connaîtra un changement démocratique dans les 5 prochaines années?">
+                    On a scale of 1-10, how optimistic are you that Cameroon will see democratic change in the next 5 years?
+                </label>
+                <div class="scale-container">
+                    <div class="scale-option">
+                        <input type="radio" name="q2" value="1" id="q2-1" required>
+                        <label for="q2-1" class="scale-label">1</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="q2" value="2" id="q2-2">
+                        <label for="q2-2" class="scale-label">2</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="q2" value="3" id="q2-3">
+                        <label for="q2-3" class="scale-label">3</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="q2" value="4" id="q2-4">
+                        <label for="q2-4" class="scale-label">4</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="q2" value="5" id="q2-5">
+                        <label for="q2-5" class="scale-label">5</label>
+                    </div>
+                </div>
+                <div class="scale-container" style="margin-top: 10px;">
+                    <div class="scale-option">
+                        <input type="radio" name="q2" value="6" id="q2-6">
+                        <label for="q2-6" class="scale-label">6</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="q2" value="7" id="q2-7">
+                        <label for="q2-7" class="scale-label">7</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="q2" value="8" id="q2-8">
+                        <label for="q2-8" class="scale-label">8</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="q2" value="9" id="q2-9">
+                        <label for="q2-9" class="scale-label">9</label>
+                    </div>
+                    <div class="scale-option">
+                        <input type="radio" name="q2" value="10" id="q2-10">
+                        <label for="q2-10" class="scale-label">10</label>
+                    </div>
+                </div>
+                <div class="scale-labels">
+                    <span data-en="Not optimistic" data-fr="Pas optimiste">Not optimistic</span>
+                    <span data-en="Very optimistic" data-fr="Très optimiste">Very optimistic</span>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" data-en="Submit Survey" data-fr="Soumettre l'enquête">Submit Survey</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p data-en="Submitting..." data-fr="Envoi en cours...">Submitting...</p>
+        </div>
+
+        <div class="success-message" id="successMessage">
+            <div class="success-icon">✅</div>
+            <h2 data-en="Thank You!" data-fr="Merci!">Thank You!</h2>
+            <p data-en="Your response has been recorded." data-fr="Votre réponse a été enregistrée.">Your response has been recorded.</p>
+        </div>
+    </div>
+
+    <script>
+        let currentLang = 'en';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby1fJkzaKLMuj_Gq7qXYigQR89UIyawORPueVvT8HClwGVsUGN5YtJkNiWFjvoNmWHqQw/exec'; // Replace with your deployed script URL
+        const SURVEY_ID = 'survey1';
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+            
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('lang-' + lang).classList.add('active');
+            
+            document.querySelectorAll('[data-en]').forEach(element => {
+                const text = element.getAttribute('data-' + lang);
+                if (element.tagName === 'LABEL' || element.tagName === 'SPAN' || element.tagName === 'P' || element.tagName === 'H1' || element.tagName === 'H2') {
+                    element.textContent = text;
+                } else if (element.tagName === 'BUTTON') {
+                    element.textContent = text;
+                }
+            });
+        }
+
+        document.getElementById('surveyForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = {
+                surveyId: SURVEY_ID,
+                timestamp: new Date().toISOString(),
+                q1: formData.get('q1'),
+                q2: formData.get('q2'),
+                language: currentLang
+            };
+
+            // Show loading
+            document.getElementById('surveyForm').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('errorMessage').classList.remove('show');
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                // With no-cors, we can't check response status, so assume success
+                setTimeout(() => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('successMessage').classList.add('show');
+                }, 1000);
+
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('surveyForm').style.display = 'block';
+                const errorMsg = document.getElementById('errorMessage');
+                errorMsg.textContent = currentLang === 'en' ? 
+                    'Error submitting survey. Please try again.' : 
+                    'Erreur lors de la soumission. Veuillez réessayer.';
+                errorMsg.classList.add('show');
+            }
+        });
+    </script>
+</body>
+</html>

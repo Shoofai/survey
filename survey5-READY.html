@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commitment Check Survey</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            background: linear-gradient(135deg, #009739 0%, #FCD116 50%, #CE1126 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .survey-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .flag {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: #009739;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .language-switcher {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .lang-btn {
+            padding: 8px 20px;
+            margin: 0 5px;
+            border: 2px solid #009739;
+            background: white;
+            color: #009739;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Sora', sans-serif;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .lang-btn.active {
+            background: #009739;
+            color: white;
+        }
+
+        .question {
+            margin-bottom: 30px;
+        }
+
+        .question-label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 1.05rem;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .radio-option:hover {
+            border-color: #009739;
+            background: #f0f9f4;
+        }
+
+        .radio-option input[type="radio"] {
+            margin-right: 12px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .radio-option label {
+            cursor: pointer;
+            flex: 1;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-family: 'Sora', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            margin-top: 10px;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #009739;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: #009739;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+            font-family: 'Sora', sans-serif;
+        }
+
+        .submit-btn:hover {
+            background: #007a2f;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,151,57,0.3);
+        }
+
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .error-message {
+            background: #ffe0e0;
+            color: #cc0000;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #009739;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 600px) {
+            .survey-container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="survey-container">
+        <div class="header">
+            <div class="flag">🇨🇲</div>
+            <h1 data-en="Commitment Check Survey" data-fr="Enquête sur l'Engagement">Commitment Check Survey</h1>
+            <p class="subtitle" data-en="Help us understand how you want to contribute" data-fr="Aidez-nous à comprendre comment vous souhaitez contribuer">Help us understand how you want to contribute</p>
+        </div>
+
+        <div class="language-switcher">
+            <button onclick="switchLanguage('en')" class="lang-btn active" id="lang-en">English</button>
+            <button onclick="switchLanguage('fr')" class="lang-btn" id="lang-fr">Français</button>
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+        
+        <form id="surveyForm">
+            <div class="question">
+                <label class="question-label" data-en="Choose your lane:" data-fr="Choisissez votre voie :">
+                    Choose your lane:
+                </label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" name="q1" value="Join organized resistance" id="q1-1" required>
+                        <label for="q1-1" data-en="Join organized resistance" data-fr="Rejoindre la résistance organisée">Join organized resistance</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="q1" value="Become active communicator" id="q1-2">
+                        <label for="q1-2" data-en="Become active communicator" data-fr="Devenir communicateur actif">Become active communicator</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="q1" value="Leverage business/tech" id="q1-3">
+                        <label for="q1-3" data-en="Leverage business/tech" data-fr="Exploiter les affaires/la technologie">Leverage business/tech</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="q1" value="Support with funding" id="q1-4">
+                        <label for="q1-4" data-en="Support with funding" data-fr="Soutenir avec le financement">Support with funding</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="q1" value="Other" id="q1-5" onclick="toggleOtherField()">
+                        <label for="q1-5" data-en="Other (please specify)" data-fr="Autre (veuillez préciser)">Other (please specify)</label>
+                    </div>
+                </div>
+                <input type="text" id="otherField" name="q1_other" style="display:none;" 
+                       data-placeholder-en="Please specify your contribution..." 
+                       data-placeholder-fr="Veuillez préciser votre contribution..." 
+                       placeholder="Please specify your contribution...">
+            </div>
+
+            <div class="question">
+                <label class="question-label" data-en="Will you attend the next Project C Zoom call?" data-fr="Participerez-vous au prochain appel Zoom du Project C?">
+                    Will you attend the next Project C Zoom call?
+                </label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" name="q2" value="Yes" id="q2-1" required>
+                        <label for="q2-1" data-en="Yes" data-fr="Oui">Yes</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="q2" value="No" id="q2-2">
+                        <label for="q2-2" data-en="No" data-fr="Non">No</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="q2" value="Maybe" id="q2-3">
+                        <label for="q2-3" data-en="Maybe" data-fr="Peut-être">Maybe</label>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn" data-en="Submit Survey" data-fr="Soumettre l'enquête">Submit Survey</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p data-en="Submitting..." data-fr="Envoi en cours...">Submitting...</p>
+        </div>
+
+        <div class="success-message" id="successMessage">
+            <div class="success-icon">✅</div>
+            <h2 data-en="Thank You!" data-fr="Merci!">Thank You!</h2>
+            <p data-en="Your response has been recorded." data-fr="Votre réponse a été enregistrée.">Your response has been recorded.</p>
+        </div>
+    </div>
+
+    <script>
+        let currentLang = 'en';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby1fJkzaKLMuj_Gq7qXYigQR89UIyawORPueVvT8HClwGVsUGN5YtJkNiWFjvoNmWHqQw/exec';
+        const SURVEY_ID = 'survey5';
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+            
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('lang-' + lang).classList.add('active');
+            
+            document.querySelectorAll('[data-en]').forEach(element => {
+                const text = element.getAttribute('data-' + lang);
+                if (element.tagName === 'LABEL' || element.tagName === 'SPAN' || element.tagName === 'P' || element.tagName === 'H1' || element.tagName === 'H2') {
+                    element.textContent = text;
+                } else if (element.tagName === 'BUTTON') {
+                    element.textContent = text;
+                }
+            });
+
+            // Update placeholder
+            const otherField = document.getElementById('otherField');
+            if (otherField) {
+                otherField.placeholder = otherField.getAttribute('data-placeholder-' + lang);
+            }
+        }
+
+        function toggleOtherField() {
+            const otherField = document.getElementById('otherField');
+            const otherRadio = document.getElementById('q1-5');
+            if (otherRadio.checked) {
+                otherField.style.display = 'block';
+                otherField.required = true;
+            } else {
+                otherField.style.display = 'none';
+                otherField.required = false;
+            }
+        }
+
+        // Add listener to all radio buttons to hide "Other" field when other options selected
+        document.querySelectorAll('input[name="q1"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.id !== 'q1-5') {
+                    document.getElementById('otherField').style.display = 'none';
+                    document.getElementById('otherField').required = false;
+                }
+            });
+        });
+
+        document.getElementById('surveyForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            let q1Value = formData.get('q1');
+            
+            // If "Other" is selected, use the text field value
+            if (q1Value === 'Other') {
+                q1Value = 'Other: ' + formData.get('q1_other');
+            }
+            
+            const data = {
+                surveyId: SURVEY_ID,
+                timestamp: new Date().toISOString(),
+                q1: q1Value,
+                q2: formData.get('q2'),
+                language: currentLang
+            };
+
+            document.getElementById('surveyForm').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('errorMessage').classList.remove('show');
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                setTimeout(() => {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('successMessage').classList.add('show');
+                }, 1000);
+
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('surveyForm').style.display = 'block';
+                const errorMsg = document.getElementById('errorMessage');
+                errorMsg.textContent = currentLang === 'en' ? 
+                    'Error submitting survey. Please try again.' : 
+                    'Erreur lors de la soumission. Veuillez réessayer.';
+                errorMsg.classList.add('show');
+            }
+        });
+    </script>
+</body>
+</html>

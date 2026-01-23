@@ -1,0 +1,98 @@
+# ✅ READY TO DEPLOY FILES
+
+All 12 files have been updated with your actual Google Apps Script URL:
+https://script.google.com/macros/s/AKfycby1fJkzaKLMuj_Gq7qXYigQR89UIyawORPueVvT8HClwGVsUGN5YtJkNiWFjvoNmWHqQw/exec
+
+## 📦 Files Ready:
+
+### Surveys (5):
+- survey1-READY.html
+- survey2-READY.html
+- survey3-READY.html
+- survey4-READY.html
+- survey5-READY.html
+
+### Results Dashboards (5):
+- results1-READY.html
+- results2-READY.html
+- results3-READY.html
+- results4-READY.html
+- results5-READY.html
+
+### Voting (2):
+- voting-READY.html
+- voting-results-READY.html
+
+---
+
+## 🚀 How to Deploy:
+
+### Option 1: Replace Files on GitHub (Recommended)
+
+1. Go to https://github.com/Shoofai/survey
+2. For each file:
+   - Click on the file (e.g., `survey1.html`)
+   - Click pencil icon ✏️ (Edit)
+   - Delete all content
+   - Open the corresponding `-READY.html` file from downloads
+   - Copy ALL content
+   - Paste into GitHub
+   - Commit changes
+3. Repeat for all 12 files
+
+### Option 2: Upload New Files
+
+1. Download all 12 `-READY.html` files
+2. Rename them (remove `-READY`):
+   - `survey1-READY.html` → `survey1.html`
+   - `voting-READY.html` → `voting.html`
+   - etc.
+3. Go to https://github.com/Shoofai/survey
+4. Click "Add file" → "Upload files"
+5. Drag all 12 files
+6. Check "Replace existing files"
+7. Commit
+
+---
+
+## ✅ After Deployment:
+
+Wait 2-3 minutes, then test:
+
+**Surveys:**
+- https://shoofai.github.io/survey/survey1.html
+- https://shoofai.github.io/survey/survey2.html
+- etc.
+
+**Voting:**
+- https://shoofai.github.io/survey/voting.html
+
+**Results:**
+- https://shoofai.github.io/survey/results1.html
+- https://shoofai.github.io/survey/voting-results.html
+
+**Check your Google Sheet** - data should appear! ✅
+
+---
+
+## 🔍 What Changed:
+
+All files now have:
+```javascript
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby1fJkzaKLMuj_Gq7qXYigQR89UIyawORPueVvT8HClwGVsUGN5YtJkNiWFjvoNmWHqQw/exec';
+```
+
+Instead of:
+```javascript
+const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE';
+```
+
+Results files also have the correct parameters:
+- `?survey=survey1` (for survey results)
+- `?vote=strategic_framework_vote` (for voting results)
+
+---
+
+## 🎯 You're Done!
+
+Just upload these 12 files and everything will work! 🚀
