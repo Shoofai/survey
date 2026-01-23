@@ -452,7 +452,7 @@
 
     <script>
         let currentLang = 'en';
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwTqtu5esoLkEKy5_bvBCgmObMmi8UOJRuMv6mDkFCp/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzN1EVKRdBTIJuAFMsAtjNBfNKvjX21VpfJhP8NJ9y5mmklfrfABbmOQPvggzTcTo2H1g/exec';
         const VOTE_ID = 'strategic_framework_vote';
 
         function switchLanguage(lang) {
@@ -515,7 +515,6 @@
             try {
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors',
                     headers: {
                         'Content-Type': 'application/json',
                     },
