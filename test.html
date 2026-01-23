@@ -1,20 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Test Voting</title>
+    <meta charset="UTF-8">
+    <title>Test Voting System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        button {
+            padding: 15px 30px;
+            background: #009739;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover { background: #007a2f; }
+        #result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
 </head>
 <body>
-    <h1>Test Vote</h1>
+    <h1>🧪 Test Voting System</h1>
+    <p>Click the button to submit a test vote. Check your Google Sheet to verify it works.</p>
     <button onclick="testVote()">Submit Test Vote</button>
     <div id="result"></div>
     
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzN1EVKRdBTIJuAFMsAtjNBfNKvjX21VpfJhP8NJ9y5mmklfrfABbmOQPvggzTcTo2H1g/exec';
+        // ⚠️ REPLACE THIS WITH YOUR ACTUAL DEPLOYMENT URL
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyiHvK6NmCxqm9uBvKGrks-Zq-2z01GTkNhjPZGYORKaK7qU3XdAjcc7_QX2XhuqY4H/exec';
         
         async function testVote() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = '⏳ Sending test vote...';
+            resultDiv.className = '';
+            
             const data = {
                 voteId: 'strategic_framework_vote',
-                timestamp: new Date().toISOString(),
                 voterName: 'Test User',
                 voterEmail: 'test' + Date.now() + '@example.com',
                 q1: 'Yes',
@@ -23,29 +54,25 @@
                 language: 'en'
             };
             
-            document.getElementById('result').innerHTML = 'Sending...';
-            console.log('Sending to:', SCRIPT_URL);
-            console.log('Data:', data);
-            
             try {
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data),
-                    redirect: 'follow'
+                    body: JSON.stringify(data)
                 });
                 
-                console.log('Response status:', response.status);
-                const text = await response.text();
-                console.log('Response text:', text);
+                const result = await response.json();
                 
-                document.getElementById('result').innerHTML = 'SUCCESS! Check your Google Sheet StrategicVote tab.<br>Response: ' + text;
+                if (result.success) {
+                    resultDiv.className = 'success';
+                    resultDiv.innerHTML = '<strong>✅ SUCCESS!</strong><br>Test vote submitted. Check your Google Sheet StrategicVote tab!';
+                } else {
+                    resultDiv.className = 'error';
+                    resultDiv.textContent = '❌ Error: ' + result.error;
+                }
                 
             } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('result').innerHTML = 'Error: ' + error.message;
+                resultDiv.className = 'error';
+                resultDiv.textContent = '❌ Error: ' + error.message;
             }
         }
     </script>
