@@ -377,15 +377,8 @@
 
     <script>
         let currentLang = 'en';
-        let userCountry = 'Unknown';
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbywR36kKJcmRgfAWPuIRJ_DsZ-Rcw2xhxQeot6jXjkuTO32Sq8BSftJVNkkUqvvI7h37g/exec';
+        const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE'; // Replace with your deployed script URL
         const SURVEY_ID = 'survey1';
-
-        // Get user's country on page load
-        fetch('https://ipapi.co/json/')
-            .then(r => r.json())
-            .then(data => { userCountry = data.country_name || 'Unknown'; })
-            .catch(() => { userCountry = 'Unknown'; });
 
         function switchLanguage(lang) {
             currentLang = lang;
@@ -415,8 +408,7 @@
                 timestamp: new Date().toISOString(),
                 q1: formData.get('q1'),
                 q2: formData.get('q2'),
-                language: currentLang,
-                country: userCountry
+                language: currentLang
             };
 
             // Show loading

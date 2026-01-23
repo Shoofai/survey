@@ -186,14 +186,7 @@ function sanitizeData(data) {
     if (data.q2) {
       sanitized.q2 = sanitizeText(data.q2);
     }
-
-    // Sanitize country
-    if (data.country) {
-      sanitized.country = sanitizeText(data.country).substring(0, 100);
-    } else {
-      sanitized.country = 'Unknown';
-    }
-
+    
     return sanitized;
   } catch (error) {
     Logger.log('Sanitize error: ' + error.toString());
@@ -246,10 +239,9 @@ function storeSurveyResponse(data) {
     data.timestamp,
     data.q1 || '',
     data.q2 || '',
-    data.language,
-    data.country || 'Unknown'
+    data.language
   ];
-
+  
   sheet.appendRow(row);
 }
 
@@ -258,14 +250,14 @@ function storeSurveyResponse(data) {
  */
 function getHeadersForSurvey(surveyId) {
   const headers = {
-    'survey1': ['Timestamp', 'Time Outside Cameroon', 'Optimism Level (1-10)', 'Language', 'Country'],
-    'survey2': ['Timestamp', "What's Missing", 'Engagement Level', 'Language', 'Country'],
-    'survey3': ['Timestamp', 'Favorite Dish', 'Diaspora Power Thoughts', 'Language', 'Country'],
-    'survey4': ['Timestamp', 'Effective Approach', 'Risk Willingness', 'Language', 'Country'],
-    'survey5': ['Timestamp', 'Choose Your Lane', 'Attend Next Call', 'Language', 'Country']
+    'survey1': ['Timestamp', 'Time Outside Cameroon', 'Optimism Level (1-10)', 'Language'],
+    'survey2': ['Timestamp', "What's Missing", 'Engagement Level', 'Language'],
+    'survey3': ['Timestamp', 'Favorite Dish', 'Diaspora Power Thoughts', 'Language'],
+    'survey4': ['Timestamp', 'Effective Approach', 'Risk Willingness', 'Language'],
+    'survey5': ['Timestamp', 'Choose Your Lane', 'Attend Next Call', 'Language']
   };
-
-  return headers[surveyId] || ['Timestamp', 'Q1', 'Q2', 'Language', 'Country'];
+  
+  return headers[surveyId] || ['Timestamp', 'Q1', 'Q2', 'Language'];
 }
 
 /**
@@ -293,34 +285,26 @@ function getSurveyResults(surveyId) {
   // Aggregate data
   const q1Counts = {};
   const q2Counts = {};
-  const countryCounts = {};
-
+  
   responses.forEach(row => {
     const q1 = row[1];
     const q2 = row[2];
-    const country = row[4] || 'Unknown';
-
+    
     // Count Q1 responses
     if (q1) {
       q1Counts[q1] = (q1Counts[q1] || 0) + 1;
     }
-
+    
     // Count Q2 responses (for non-text questions)
     if (q2 && surveyId !== 'survey3') {
       q2Counts[q2] = (q2Counts[q2] || 0) + 1;
     }
-
-    // Count countries
-    if (country) {
-      countryCounts[country] = (countryCounts[country] || 0) + 1;
-    }
   });
-
+  
   return {
     totalResponses: responses.length,
     q1Data: q1Counts,
     q2Data: q2Counts,
-    countryData: countryCounts,
     recentResponses: responses.slice(-10).reverse() // Last 10 responses
   };
 }

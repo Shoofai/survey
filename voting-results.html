@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategic Framework Vote - Results</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Sora', sans-serif; background: #f5f5f5; color: #333; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { text-align: center; padding: 30px 20px; background: linear-gradient(135deg, #009739 0%, #FCD116 50%, #CE1126 100%); border-radius: 20px; color: white; margin-bottom: 30px; }
+        h1 { font-size: 2rem; margin-bottom: 10px; font-weight: 800; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; }
+        .stat-value { font-size: 2.5rem; font-weight: 700; color: #009739; margin-bottom: 5px; }
+        .stat-label { color: #666; font-size: 0.9rem; }
+        .chart-container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        .chart-title { font-size: 1.3rem; font-weight: 700; color: #009739; margin-bottom: 20px; }
+        .refresh-btn { display: inline-block; padding: 12px 30px; background: #009739; color: white; border: none; border-radius: 50px; font-weight: 600; cursor: pointer; font-family: 'Sora', sans-serif; font-size: 1rem; transition: all 0.3s; margin-bottom: 20px; }
+        .refresh-btn:hover { background: #007a2f; transform: scale(1.05); }
+        .loading { text-align: center; padding: 50px; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #009739; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .voters-list { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 30px; }
+        .voter-item { padding: 15px; border-bottom: 1px solid #f0f0f0; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 15px; align-items: center; }
+        .voter-item:last-child { border-bottom: none; }
+        .voter-name { font-weight: 600; color: #333; }
+        .voter-email { color: #666; font-size: 0.9rem; }
+        .vote-indicator { padding: 5px 10px; border-radius: 5px; text-align: center; font-weight: 600; font-size: 0.85rem; }
+        .vote-yes { background: #d4edda; color: #155724; }
+        .vote-no { background: #f8d7da; color: #721c24; }
+        .summary-box { background: #f0f9f4; border-left: 4px solid #009739; padding: 20px; border-radius: 10px; margin-bottom: 30px; }
+        .summary-box strong { color: #009739; font-size: 1.1rem; }
+        @media (max-width: 768px) { 
+            h1 { font-size: 1.5rem; }
+            .voter-item { grid-template-columns: 1fr; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🇨🇲 Strategic Framework Vote - Results</h1>
+            <p>Live results - Updates automatically</p>
+        </div>
+
+        <button class="refresh-btn" onclick="loadResults()">🔄 Refresh Results</button>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Loading results...</p>
+        </div>
+
+        <div id="results" style="display:none;">
+            <div class="summary-box">
+                <strong>Vote Summary</strong>
+                <p id="summaryText" style="margin-top: 10px;"></p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalVotes">0</div>
+                    <div class="stat-label">Total Votes Cast</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="q1Yes">0</div>
+                    <div class="stat-label">Q1: Yes Votes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="q2Yes">0</div>
+                    <div class="stat-label">Q2: Yes Votes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="q3Yes">0</div>
+                    <div class="stat-label">Q3: Yes Votes</div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h2 class="chart-title">Question 1: Shared Minimum Objective</h2>
+                <canvas id="chart1"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <h2 class="chart-title">Question 2: Temporary Coordination Structure</h2>
+                <canvas id="chart2"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <h2 class="chart-title">Question 3: Consensus & Governing Framework</h2>
+                <canvas id="chart3"></canvas>
+            </div>
+
+            <div class="voters-list">
+                <h2 class="chart-title">Voter Registry (For Transparency)</h2>
+                <div id="votersList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE?vote=strategic_framework_vote';
+        let chart1, chart2, chart3;
+
+        async function loadResults() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+
+            try {
+                const response = await fetch(SCRIPT_URL);
+                const result = await response.json();
+
+                if (result.success) {
+                    displayResults(result.data);
+                }
+            } catch (error) {
+                console.error('Error loading results:', error);
+            }
+        }
+
+        function displayResults(data) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('results').style.display = 'block';
+
+            // Update stats
+            document.getElementById('totalVotes').textContent = data.totalVotes;
+            document.getElementById('q1Yes').textContent = data.q1Yes;
+            document.getElementById('q2Yes').textContent = data.q2Yes;
+            document.getElementById('q3Yes').textContent = data.q3Yes;
+
+            // Calculate percentages
+            const q1Percent = data.totalVotes > 0 ? Math.round((data.q1Yes / data.totalVotes) * 100) : 0;
+            const q2Percent = data.totalVotes > 0 ? Math.round((data.q2Yes / data.totalVotes) * 100) : 0;
+            const q3Percent = data.totalVotes > 0 ? Math.round((data.q3Yes / data.totalVotes) * 100) : 0;
+
+            // Summary text
+            const summaryText = `${data.totalVotes} votes recorded. Q1: ${q1Percent}% Yes | Q2: ${q2Percent}% Yes | Q3: ${q3Percent}% Yes`;
+            document.getElementById('summaryText').textContent = summaryText;
+
+            // Chart 1
+            if (chart1) chart1.destroy();
+            chart1 = createPieChart('chart1', data.q1Yes, data.totalVotes - data.q1Yes);
+
+            // Chart 2
+            if (chart2) chart2.destroy();
+            chart2 = createPieChart('chart2', data.q2Yes, data.totalVotes - data.q2Yes);
+
+            // Chart 3
+            if (chart3) chart3.destroy();
+            chart3 = createPieChart('chart3', data.q3Yes, data.totalVotes - data.q3Yes);
+
+            // Display voters list
+            displayVotersList(data.voters);
+        }
+
+        function createPieChart(canvasId, yesCount, noCount) {
+            return new Chart(document.getElementById(canvasId), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Yes', 'No'],
+                    datasets: [{
+                        data: [yesCount, noCount],
+                        backgroundColor: ['#009739', '#CE1126'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { size: 14, weight: 'bold' }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function displayVotersList(voters) {
+            const votersList = document.getElementById('votersList');
+            votersList.innerHTML = '';
+
+            if (!voters || voters.length === 0) {
+                votersList.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No votes recorded yet.</p>';
+                return;
+            }
+
+            // Header
+            votersList.innerHTML = `
+                <div class="voter-item" style="font-weight: 700; background: #f9f9f9; border-bottom: 2px solid #009739;">
+                    <div>Name</div>
+                    <div style="text-align: center;">Q1</div>
+                    <div style="text-align: center;">Q2</div>
+                    <div style="text-align: center;">Q3</div>
+                </div>
+            `;
+
+            voters.forEach(voter => {
+                const item = document.createElement('div');
+                item.className = 'voter-item';
+                item.innerHTML = `
+                    <div>
+                        <div class="voter-name">${voter.name}</div>
+                        <div class="voter-email">${voter.email}</div>
+                    </div>
+                    <div class="vote-indicator ${voter.q1 === 'Yes' ? 'vote-yes' : 'vote-no'}">${voter.q1}</div>
+                    <div class="vote-indicator ${voter.q2 === 'Yes' ? 'vote-yes' : 'vote-no'}">${voter.q2}</div>
+                    <div class="vote-indicator ${voter.q3 === 'Yes' ? 'vote-yes' : 'vote-no'}">${voter.q3}</div>
+                `;
+                votersList.appendChild(item);
+            });
+        }
+
+        // Auto-refresh every 30 seconds
+        setInterval(loadResults, 30000);
+
+        // Load on page load
+        loadResults();
+    </script>
+</body>
+</html>
