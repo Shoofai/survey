@@ -18,6 +18,7 @@
             border-radius: 8px;
             font-size: 16px;
             cursor: pointer;
+            margin: 10px;
         }
         button:hover { background: #007a2f; }
         #result {
@@ -30,14 +31,16 @@
     </style>
 </head>
 <body>
-    <h1>🧪 Test Voting System</h1>
-    <p>Click the button to submit a test vote. Check your Google Sheet to verify it works.</p>
-    <button onclick="testVote()">Submit Test Vote</button>
+    <h1>🧪 Test Unified System</h1>
+    <p>Click buttons to test the system. Check your Google Sheet after each test.</p>
+    
+    <button onclick="testVote()">Test Vote</button>
+    <button onclick="testSurvey()">Test Survey 1</button>
+    
     <div id="result"></div>
     
     <script>
-        // ⚠️ REPLACE THIS WITH YOUR ACTUAL DEPLOYMENT URL
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyiHvK6NmCxqm9uBvKGrks-Zq-2z01GTkNhjPZGYORKaK7qU3XdAjcc7_QX2XhuqY4H/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZW73O34AQDahI2YEqTWdilyOirLwWQiFT5sGUjKoZNIkfEtYJIJMe6Bc_ffC2S7xCig/exec';
         
         async function testVote() {
             const resultDiv = document.getElementById('result');
@@ -46,8 +49,8 @@
             
             const data = {
                 voteId: 'strategic_framework_vote',
-                voterName: 'Test User',
-                voterEmail: 'test' + Date.now() + '@example.com',
+                voterName: 'Test Voter',
+                voterEmail: 'testvote' + Date.now() + '@example.com',
                 q1: 'Yes',
                 q2: 'Yes',
                 q3: 'No',
@@ -64,7 +67,47 @@
                 
                 if (result.success) {
                     resultDiv.className = 'success';
-                    resultDiv.innerHTML = '<strong>✅ SUCCESS!</strong><br>Test vote submitted. Check your Google Sheet StrategicVote tab!';
+                    resultDiv.innerHTML = '<strong>✅ VOTE SUCCESS!</strong><br>Check Google Sheet → StrategicVote tab';
+                } else {
+                    resultDiv.className = 'error';
+                    resultDiv.textContent = '❌ Error: ' + result.error;
+                }
+                
+            } catch (error) {
+                resultDiv.className = 'error';
+                resultDiv.textContent = '❌ Error: ' + error.message;
+            }
+        }
+        
+        async function testSurvey() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = '⏳ Sending test survey...';
+            resultDiv.className = '';
+            
+            const data = {
+                surveyId: 'survey1',
+                respondentName: 'Test Respondent',
+                respondentEmail: 'testsurvey' + Date.now() + '@example.com',
+                q1: 'Answer 1',
+                q2: 'Answer 2',
+                q3: 'Answer 3',
+                q4: 'Answer 4',
+                q5: 'Answer 5',
+                comments: 'Test comment',
+                language: 'en'
+            };
+            
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    resultDiv.className = 'success';
+                    resultDiv.innerHTML = '<strong>✅ SURVEY SUCCESS!</strong><br>Check Google Sheet → Survey1 tab';
                 } else {
                     resultDiv.className = 'error';
                     resultDiv.textContent = '❌ Error: ' + result.error;
