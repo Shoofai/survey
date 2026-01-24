@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I'm A Builder - Project C</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/css/intlTelInput.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Sora', sans-serif; 
+            background: linear-gradient(135deg, #009739 0%, #FCD116 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container { 
+            background: white; 
+            border-radius: 20px; 
+            padding: 50px;
+            max-width: 850px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .header { text-align: center; margin-bottom: 35px; }
+        h1 { color: #009739; font-size: 2.5rem; font-weight: 800; margin-bottom: 10px; }
+        .subtitle { font-size: 1.2rem; color: #666; }
+        .lang-switcher { 
+            position: absolute; 
+            top: 20px; 
+            right: 20px; 
+            background: white; 
+            padding: 5px; 
+            border-radius: 50px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+            z-index: 999;
+        }
+        .lang-btn { 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 50px; 
+            font-size: 1rem; 
+            font-weight: 700; 
+            background: transparent; 
+            cursor: pointer; 
+            font-family: 'Sora', sans-serif;
+            color: #333;
+        }
+        .lang-btn.active { background: #009739; color: white; }
+        .progress-container { margin-bottom: 40px; }
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #e0e0e0;
+            z-index: 0;
+        }
+        .progress-line {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #009739 0%, #FCD116 100%);
+            transition: width 0.3s;
+            z-index: 1;
+        }
+        .progress-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+            flex: 1;
+        }
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: white;
+            border: 4px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: #999;
+            transition: all 0.3s;
+            margin-bottom: 8px;
+        }
+        .progress-step.active .step-circle {
+            border-color: #009739;
+            color: #009739;
+            background: #f0f9f4;
+        }
+        .progress-step.completed .step-circle {
+            background: #009739;
+            border-color: #009739;
+            color: white;
+        }
+        .step-label {
+            font-size: 0.8rem;
+            color: #999;
+            font-weight: 600;
+            text-align: center;
+        }
+        .progress-step.active .step-label {
+            color: #009739;
+        }
+        .step { display: none; }
+        .step.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .question-header { text-align: center; margin-bottom: 35px; }
+        .question-text { font-size: 1.8rem; font-weight: 700; color: #333; line-height: 1.4; }
+        .helper-text { font-size: 0.95rem; color: #666; margin-bottom: 20px; font-style: italic; text-align: center; }
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        .checkbox-option { position: relative; }
+        .checkbox-option input { position: absolute; opacity: 0; }
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 22px;
+            background: white;
+            border: 3px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .checkbox-option input:checked + .checkbox-label {
+            background: linear-gradient(135deg, #009739 0%, #00b547 100%);
+            color: white;
+            border-color: #009739;
+            box-shadow: 0 4px 20px rgba(0,151,57,0.3);
+        }
+        .checkbox-label:hover { border-color: #009739; }
+        .radio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        .radio-option { position: relative; }
+        .radio-option input { position: absolute; opacity: 0; }
+        .radio-label {
+            display: block;
+            padding: 20px;
+            background: white;
+            border: 3px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        .radio-option input:checked + .radio-label {
+            background: linear-gradient(135deg, #009739 0%, #00b547 100%);
+            color: white;
+            border-color: #009739;
+            box-shadow: 0 4px 20px rgba(0,151,57,0.3);
+        }
+        .radio-label:hover { border-color: #009739; }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 700; color: #333; margin-bottom: 12px; font-size: 1.1rem; }
+        .required { color: #CE1126; }
+        input[type="text"], input[type="email"], input[type="tel"] {
+            width: 100%;
+            padding: 18px 22px;
+            border: 3px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-family: 'Sora', sans-serif;
+            transition: all 0.3s;
+        }
+        input:focus { outline: none; border-color: #009739; box-shadow: 0 0 0 4px rgba(0,151,57,0.1); }
+        .iti { width: 100%; }
+        #phone { padding-left: 70px; }
+        .consent-box {
+            background: #f9f9f9;
+            border: 3px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 22px;
+            margin: 25px 0;
+        }
+        .consent-checkbox {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        .consent-checkbox input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            margin-top: 3px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .consent-text { font-size: 1rem; line-height: 1.6; color: #333; }
+        .nav-buttons { 
+            display: flex; 
+            gap: 15px; 
+            margin-top: 40px; 
+            justify-content: space-between;
+        }
+        .btn {
+            padding: 18px 45px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Sora', sans-serif;
+            transition: all 0.3s;
+        }
+        .btn-prev { background: #f0f0f0; color: #333; }
+        .btn-prev:hover { background: #e0e0e0; transform: translateX(-3px); }
+        .btn-next, .btn-submit { 
+            background: linear-gradient(135deg, #009739 0%, #00b547 100%); 
+            color: white; 
+            flex-grow: 1;
+            box-shadow: 0 5px 20px rgba(0,151,57,0.3);
+        }
+        .btn-next:hover, .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,151,57,0.4); }
+        .btn:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
+        .loading { text-align: center; padding: 60px; display: none; }
+        .spinner { 
+            border: 5px solid #f3f3f3; 
+            border-top: 5px solid #009739; 
+            border-radius: 50%; 
+            width: 70px; 
+            height: 70px; 
+            animation: spin 1s linear infinite; 
+            margin: 0 auto 30px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .message { padding: 30px; border-radius: 15px; margin-top: 30px; display: none; font-size: 1.2rem; text-align: center; }
+        .success { background: #d4edda; color: #155724; border: 3px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 3px solid #f5c6cb; }
+        @media (max-width: 768px) {
+            .container { padding: 30px 25px; }
+            h1 { font-size: 2rem; }
+            .question-text { font-size: 1.5rem; }
+            .checkbox-grid, .radio-grid { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+            .step-label { font-size: 0.7rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="lang-switcher">
+        <button class="lang-btn active" onclick="switchLanguage('en')" id="lang-en">EN</button>
+        <button class="lang-btn" onclick="switchLanguage('fr')" id="lang-fr">FR</button>
+    </div>
+    
+    <div class="container">
+        <div class="header">
+            <h1 data-en="💪 I'm A Builder" data-fr="💪 Je Suis Un Bâtisseur">💪 I'm A Builder</h1>
+            <p class="subtitle" data-en="Commitment Form • Project C" data-fr="Formulaire d'Engagement • Projet C">Commitment Form • Project C</p>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-steps">
+                <div class="progress-line" id="progressLine"></div>
+                <div class="progress-step active" data-step="1">
+                    <div class="step-circle">1</div>
+                    <div class="step-label" data-en="Pillars" data-fr="Piliers">Pillars</div>
+                </div>
+                <div class="progress-step" data-step="2">
+                    <div class="step-circle">2</div>
+                    <div class="step-label" data-en="Skills" data-fr="Compétences">Skills</div>
+                </div>
+                <div class="progress-step" data-step="3">
+                    <div class="step-circle">3</div>
+                    <div class="step-label" data-en="Time" data-fr="Temps">Time</div>
+                </div>
+                <div class="progress-step" data-step="4">
+                    <div class="step-circle">4</div>
+                    <div class="step-label" data-en="Contact" data-fr="Contact">Contact</div>
+                </div>
+            </div>
+        </div>
+
+        <form id="builderForm">
+            <!-- Step 1: Pillars -->
+            <div class="step active" data-step="1">
+                <div class="question-header">
+                    <div class="question-text" 
+                         data-en="Which pillar(s) will you help build?"
+                         data-fr="Quel(s) pilier(s) allez-vous aider à construire ?">
+                        Which pillar(s) will you help build?
+                    </div>
+                </div>
+                <div class="helper-text" 
+                     data-en="Select all that apply"
+                     data-fr="Sélectionnez toutes les options">
+                    Select all that apply
+                </div>
+                <div class="checkbox-grid">
+                    <div class="checkbox-option">
+                        <input type="checkbox" name="pillars" value="Governance & Institutional Reform" id="pil1">
+                        <label for="pil1" class="checkbox-label">
+                            <span data-en="🟢 Governance & Institutional Reform" data-fr="🟢 Gouvernance & Réforme">🟢 Governance & Institutional Reform</span>
+                        </label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" name="pillars" value="Social Cohesion & Community Engagement" id="pil2">
+                        <label for="pil2" class="checkbox-label">
+                            <span data-en="🔵 Social Cohesion & Community" data-fr="🔵 Cohésion Sociale">🔵 Social Cohesion & Community</span>
+                        </label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" name="pillars" value="International Outreach & Advocacy" id="pil3">
+                        <label for="pil3" class="checkbox-label">
+                            <span data-en="🟡 International Outreach & Advocacy" data-fr="🟡 Plaidoyer International">🟡 International Outreach & Advocacy</span>
+                        </label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" name="pillars" value="Economic & Reconstruction Planning" id="pil4">
+                        <label for="pil4" class="checkbox-label">
+                            <span data-en="🔴 Economic & Reconstruction" data-fr="🔴 Économique & Reconstruction">🔴 Economic & Reconstruction</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="nav-buttons">
+                    <button type="button" class="btn btn-next" onclick="nextStep()">
+                        <span data-en="Next →" data-fr="Suivant →">Next →</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Skills -->
+            <div class="step" data-step="2">
+                <div class="question-header">
+                    <div class="question-text" 
+                         data-en="What skills do you bring?"
+                         data-fr="Quelles compétences apportez-vous ?">
+                        What skills do you bring?
+                    </div>
+                </div>
+                <div class="helper-text" 
+                     data-en="Select all that apply"
+                     data-fr="Sélectionnez toutes les options">
+                    Select all that apply
+                </div>
+                <div class="checkbox-grid">
+                    <div class="checkbox-option">
+                        <input type="checkbox" name="skills" value="Law / Policy / Governance" id="sk1">
+                        <label for="sk1" class="checkbox-label">
+                            <span data-en="⚖️ Law / Policy / Governance" data-fr="⚖️ Droit / Politique">⚖️ Law / Policy / Governance</span>
+                        </label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" name="skills" value="Technology / Digital / Data" id="sk2">
+                        <label for="sk2" class="checkbox-label">
+                            <span data-en="💻 Technology / Digital / Data" data-fr="💻 Technologie / Digital">💻 Technology / Digital / Data</span>
+                        </label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" name="skills" value="Communications / Media / Content" id="sk3">
+                        <label for="sk3" class="checkbox-label">
+                            <span data-en="📢 Communications / Media" data-fr="📢 Communications / Médias">📢 Communications / Media</span>
+                        </label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" name="skills" value="Finance / Economics / Investment" id="sk4">
+                        <label for="sk4" class="checkbox-label">
+                            <span data-en="💰 Finance / Economics" data-fr="💰 Finance / Économie">💰 Finance / Economics</span>
+                        </label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" name="skills" value="Healthcare / Public Health" id="sk5">
+                        <label for="sk5" class="checkbox-label">
+                            <span data-en="🏥 Healthcare / Public Health" data-fr="🏥 Santé Publique">🏥 Healthcare / Public Health</span>
+                        </label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" name="skills" value="Education / Training" id="sk6">
+                        <label for="sk6" class="checkbox-label">
+                            <span data-en="📚 Education / Training" data-fr="📚 Éducation / Formation">📚 Education / Training</span>
+                        </label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" name="skills" value="Engineering / Infrastructure" id="sk7">
+                        <label for="sk7" class="checkbox-label">
+                            <span data-en="🏗️ Engineering / Infrastructure" data-fr="🏗️ Ingénierie">🏗️ Engineering / Infrastructure</span>
+                        </label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" name="skills" value="Arts / Culture / History" id="sk8">
+                        <label for="sk8" class="checkbox-label">
+                            <span data-en="🎨 Arts / Culture / History" data-fr="🎨 Arts / Culture">🎨 Arts / Culture / History</span>
+                        </label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" name="skills" value="Organizing / Mobilization" id="sk9">
+                        <label for="sk9" class="checkbox-label">
+                            <span data-en="🤝 Organizing / Mobilization" data-fr="🤝 Organisation">🤝 Organizing / Mobilization</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="skillsOther" 
+                           data-placeholder-en="Other skills (optional)"
+                           data-placeholder-fr="Autres compétences (optionnel)"
+                           placeholder="Other skills (optional)">
+                </div>
+                <div class="nav-buttons">
+                    <button type="button" class="btn btn-prev" onclick="prevStep()">
+                        <span data-en="← Back" data-fr="← Retour">← Back</span>
+                    </button>
+                    <button type="button" class="btn btn-next" onclick="nextStep()">
+                        <span data-en="Next →" data-fr="Suivant →">Next →</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Hours + Location -->
+            <div class="step" data-step="3">
+                <div class="question-header">
+                    <div class="question-text" 
+                         data-en="How many hours per month can you commit?"
+                         data-fr="Combien d'heures par mois pouvez-vous consacrer ?">
+                        How many hours per month can you commit?
+                    </div>
+                </div>
+                <div class="radio-grid">
+                    <div class="radio-option">
+                        <input type="radio" name="hours" value="1-5 hours" id="h1" required>
+                        <label for="h1" class="radio-label">
+                            <span data-en="1-5 hours" data-fr="1-5 heures">1-5 hours</span>
+                        </label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="hours" value="5-10 hours" id="h2">
+                        <label for="h2" class="radio-label">
+                            <span data-en="5-10 hours" data-fr="5-10 heures">5-10 hours</span>
+                        </label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="hours" value="10-20 hours" id="h3">
+                        <label for="h3" class="radio-label">
+                            <span data-en="10-20 hours" data-fr="10-20 heures">10-20 hours</span>
+                        </label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="hours" value="20+ hours" id="h4">
+                        <label for="h4" class="radio-label">
+                            <span data-en="20+ hours" data-fr="20+ heures">20+ hours</span>
+                        </label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="hours" value="Support only" id="h5">
+                        <label for="h5" class="radio-label">
+                            <span data-en="Support only" data-fr="Soutien seulement">Support only</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="question-header" style="margin-top: 50px;">
+                    <div class="question-text" style="font-size: 1.5rem;"
+                         data-en="Your Location"
+                         data-fr="Votre Localisation">
+                        Your Location
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><span data-en="City" data-fr="Ville">City</span> <span class="required">*</span></label>
+                        <input type="text" id="city" required 
+                               data-placeholder-en="Your city"
+                               data-placeholder-fr="Votre ville"
+                               placeholder="Your city">
+                    </div>
+                    <div class="form-group">
+                        <label><span data-en="Country" data-fr="Pays">Country</span> <span class="required">*</span></label>
+                        <input type="text" id="country" required 
+                               data-placeholder-en="Your country"
+                               data-placeholder-fr="Votre pays"
+                               placeholder="Your country">
+                    </div>
+                </div>
+                <div class="nav-buttons">
+                    <button type="button" class="btn btn-prev" onclick="prevStep()">
+                        <span data-en="← Back" data-fr="← Retour">← Back</span>
+                    </button>
+                    <button type="button" class="btn btn-next" onclick="nextStep()">
+                        <span data-en="Next →" data-fr="Suivant →">Next →</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 4: Contact + Consent -->
+            <div class="step" data-step="4">
+                <div class="question-header">
+                    <div class="question-text" 
+                         data-en="Contact Information"
+                         data-fr="Informations de Contact">
+                        Contact Information
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><span data-en="Full Name" data-fr="Nom Complet">Full Name</span> <span class="required">*</span></label>
+                    <input type="text" id="name" required 
+                           data-placeholder-en="Enter your full name"
+                           data-placeholder-fr="Entrez votre nom complet"
+                           placeholder="Enter your full name">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label><span data-en="Email Address" data-fr="Adresse Email">Email Address</span> <span class="required">*</span></label>
+                        <input type="email" id="email" required 
+                               data-placeholder-en="your.email@example.com"
+                               data-placeholder-fr="votre.email@exemple.com"
+                               placeholder="your.email@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label><span data-en="Mobile Number" data-fr="Numéro de Mobile">Mobile Number</span> <span class="required">*</span></label>
+                        <input type="tel" id="phone" required 
+                               data-placeholder-en="Your mobile number"
+                               data-placeholder-fr="Votre numéro"
+                               placeholder="Your mobile number">
+                    </div>
+                </div>
+
+                <div class="consent-box">
+                    <div class="consent-checkbox">
+                        <input type="checkbox" id="consent" required>
+                        <label for="consent" class="consent-text">
+                            <span data-en="I consent to being contacted about Project C activities and understand my information will be used for coordination purposes only. My data will be handled securely and I can withdraw consent at any time." 
+                                  data-fr="Je consens à être contacté au sujet des activités du Projet C et je comprends que mes informations seront utilisées uniquement à des fins de coordination. Mes données seront traitées en toute sécurité et je peux retirer mon consentement à tout moment.">
+                                I consent to being contacted about Project C activities and understand my information will be used for coordination purposes only. My data will be handled securely and I can withdraw consent at any time.
+                            </span>
+                            <span class="required">*</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button type="button" class="btn btn-prev" onclick="prevStep()">
+                        <span data-en="← Back" data-fr="← Retour">← Back</span>
+                    </button>
+                    <button type="submit" class="btn btn-submit">
+                        <span data-en="✅ Submit My Commitment" data-fr="✅ Soumettre">✅ Submit My Commitment</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="color: #666; font-weight: 600; font-size: 1.3rem;" 
+               data-en="Submitting..."
+               data-fr="Soumission...">Submitting...</p>
+        </div>
+
+        <div class="message" id="message"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/js/intlTelInput.min.js"></script>
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZW73O34AQDahI2YEqTWdilyOirLwWQiFT5sGUjKoZNIkfEtYJIJMe6Bc_ffC2S7xCig/exec';
+        let currentLang = 'en';
+        let currentStep = 1;
+        let phoneInput;
+
+        const phoneField = document.querySelector("#phone");
+        phoneInput = window.intlTelInput(phoneField, {
+            initialCountry: "us",
+            preferredCountries: ["us", "cm", "fr", "gb", "ca"],
+            utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@19.5.6/build/js/utils.js"
+        });
+
+        function updateProgress() {
+            const progressSteps = document.querySelectorAll('.progress-step');
+            const progressLine = document.getElementById('progressLine');
+            
+            progressSteps.forEach((step, index) => {
+                const stepNum = index + 1;
+                if (stepNum < currentStep) {
+                    step.classList.add('completed');
+                    step.classList.remove('active');
+                } else if (stepNum === currentStep) {
+                    step.classList.add('active');
+                    step.classList.remove('completed');
+                } else {
+                    step.classList.remove('active', 'completed');
+                }
+            });
+
+            const progress = ((currentStep - 1) / 3) * 100;
+            progressLine.style.width = progress + '%';
+        }
+
+        function nextStep() {
+            // Validate Step 3 (Hours + Location)
+            if (currentStep === 3) {
+                // Check hours selection
+                if (!document.querySelector('input[name="hours"]:checked')) {
+                    alert(currentLang === 'en' 
+                        ? '⚠️ Please select your monthly hours commitment.' 
+                        : '⚠️ Veuillez sélectionner votre engagement mensuel.');
+                    return;
+                }
+                
+                // Check city
+                const city = document.getElementById('city').value.trim();
+                if (!city) {
+                    alert(currentLang === 'en' 
+                        ? '⚠️ Please enter your city.' 
+                        : '⚠️ Veuillez entrer votre ville.');
+                    document.getElementById('city').focus();
+                    return;
+                }
+                
+                // Check country
+                const country = document.getElementById('country').value.trim();
+                if (!country) {
+                    alert(currentLang === 'en' 
+                        ? '⚠️ Please enter your country.' 
+                        : '⚠️ Veuillez entrer votre pays.');
+                    document.getElementById('country').focus();
+                    return;
+                }
+            }
+
+            document.querySelector(`.step[data-step="${currentStep}"]`).classList.remove('active');
+            currentStep++;
+            document.querySelector(`.step[data-step="${currentStep}"]`).classList.add('active');
+            updateProgress();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function prevStep() {
+            document.querySelector(`.step[data-step="${currentStep}"]`).classList.remove('active');
+            currentStep--;
+            document.querySelector(`.step[data-step="${currentStep}"]`).classList.add('active');
+            updateProgress();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('lang-' + lang).classList.add('active');
+            document.querySelectorAll('[data-en]').forEach(el => {
+                const text = el.getAttribute('data-' + lang);
+                if (el.tagName === 'SPAN' || el.tagName === 'LABEL') {
+                    if (el.classList.contains('consent-text')) {
+                        el.childNodes[0].textContent = text;
+                    } else {
+                        el.textContent = text;
+                    }
+                } else {
+                    el.textContent = text;
+                }
+            });
+            document.querySelectorAll('[data-placeholder-en]').forEach(input => {
+                input.placeholder = input.getAttribute('data-placeholder-' + lang);
+            });
+        }
+
+        document.getElementById('builderForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Comprehensive validation before submission
+            const name = document.getElementById('name').value.trim();
+            if (!name) {
+                alert(currentLang === 'en' ? '⚠️ Please enter your full name.' : '⚠️ Veuillez entrer votre nom complet.');
+                document.getElementById('name').focus();
+                return;
+            }
+
+            const email = document.getElementById('email').value.trim();
+            if (!email) {
+                alert(currentLang === 'en' ? '⚠️ Please enter your email address.' : '⚠️ Veuillez entrer votre adresse email.');
+                document.getElementById('email').focus();
+                return;
+            }
+
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert(currentLang === 'en' ? '⚠️ Please enter a valid email address.' : '⚠️ Veuillez entrer une adresse email valide.');
+                document.getElementById('email').focus();
+                return;
+            }
+
+            // Validate phone number
+            if (!phoneInput.isValidNumber()) {
+                alert(currentLang === 'en' ? '⚠️ Please enter a valid phone number.' : '⚠️ Veuillez entrer un numéro de téléphone valide.');
+                document.getElementById('phone').focus();
+                return;
+            }
+
+            // Validate consent
+            if (!document.getElementById('consent').checked) {
+                alert(currentLang === 'en' 
+                    ? '⚠️ Please agree to the consent terms to submit.' 
+                    : '⚠️ Veuillez accepter les conditions de consentement.');
+                return;
+            }
+
+            const form = document.getElementById('builderForm');
+            const loading = document.getElementById('loading');
+            const message = document.getElementById('message');
+            const submitBtn = document.querySelector('.btn-submit');
+
+            form.style.display = 'none';
+            loading.style.display = 'block';
+            submitBtn.disabled = true;
+
+            const pillars = Array.from(document.querySelectorAll('input[name="pillars"]:checked')).map(cb => cb.value);
+            const skills = Array.from(document.querySelectorAll('input[name="skills"]:checked')).map(cb => cb.value);
+            const skillsOther = document.getElementById('skillsOther').value.trim();
+            if (skillsOther) skills.push('Other: ' + skillsOther);
+
+            const data = {
+                surveyId: 'builders_poll_2026',
+                respondentName: name,
+                respondentEmail: email,
+                respondentPhone: phoneInput.getNumber(),
+                q1: pillars.length > 0 ? pillars.join('; ') : 'None selected',
+                q2: skills.length > 0 ? skills.join('; ') : 'None selected',
+                q3: document.querySelector('input[name="hours"]:checked').value,
+                q4: document.getElementById('city').value + ', ' + document.getElementById('country').value,
+                consent: document.getElementById('consent').checked,
+                language: currentLang
+            };
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                loading.style.display = 'none';
+                message.style.display = 'block';
+
+                if (result.success) {
+                    message.className = 'message success';
+                    message.innerHTML = `<h2 style="margin-bottom: 20px; font-size: 2rem;">${currentLang === 'en' ? '✅ Welcome Builder!' : '✅ Bienvenue !'}</h2>
+                        <p style="font-size: 1.3rem;">${currentLang === 'en' ? 'Thank you for your commitment! We\'ll be in touch soon.' : 'Merci pour votre engagement !'}</p>`;
+                } else {
+                    message.className = 'message error';
+                    message.innerHTML = `<h2 style="margin-bottom: 20px; font-size: 2rem;">${currentLang === 'en' ? '❌ Error' : '❌ Erreur'}</h2><p>${result.error}</p>`;
+                    form.style.display = 'block';
+                    submitBtn.disabled = false;
+                }
+            } catch (error) {
+                loading.style.display = 'none';
+                message.style.display = 'block';
+                message.className = 'message error';
+                message.innerHTML = `<h2 style="margin-bottom: 20px; font-size: 2rem;">${currentLang === 'en' ? '❌ Error' : '❌ Erreur'}</h2><p>${error.message}</p>`;
+                form.style.display = 'block';
+                submitBtn.disabled = false;
+            }
+        });
+
+        updateProgress();
+    </script>
+</body>
+</html>

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Priority Assessment - Project C</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Sora', sans-serif; 
+            background: linear-gradient(135deg, #009739 0%, #FCD116 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container { 
+            background: white; 
+            border-radius: 20px; 
+            padding: 50px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .header { text-align: center; margin-bottom: 40px; }
+        h1 { color: #009739; font-size: 2.5rem; font-weight: 800; margin-bottom: 10px; }
+        .subtitle { font-size: 1.2rem; color: #666; }
+        .lang-switcher { 
+            position: absolute; 
+            top: 20px; 
+            right: 20px; 
+            background: white; 
+            padding: 5px; 
+            border-radius: 50px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); 
+            z-index: 999;
+        }
+        .lang-btn { 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 50px; 
+            font-size: 1rem; 
+            font-weight: 700; 
+            background: transparent; 
+            cursor: pointer; 
+            font-family: 'Sora', sans-serif;
+            color: #333;
+        }
+        .lang-btn.active { background: #009739; color: white; }
+        .progress-bar { 
+            height: 8px; 
+            background: #e0e0e0; 
+            border-radius: 10px; 
+            margin-bottom: 40px; 
+            overflow: hidden;
+        }
+        .progress-fill { 
+            height: 100%; 
+            background: linear-gradient(90deg, #009739 0%, #FCD116 100%); 
+            width: 33%; 
+            transition: width 0.3s;
+        }
+        .step { display: none; }
+        .step.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .question-header { text-align: center; margin-bottom: 40px; }
+        .question-text { font-size: 1.8rem; font-weight: 700; color: #333; line-height: 1.4; }
+        .slider-container { margin: 50px 0; }
+        .slider-labels { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 1.1rem; color: #666; font-weight: 600; }
+        input[type="range"] {
+            width: 100%;
+            height: 12px;
+            border-radius: 6px;
+            background: linear-gradient(90deg, #CE1126 0%, #FCD116 50%, #009739 100%);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #009739;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,151,57,0.5);
+        }
+        input[type="range"]::-moz-range-thumb {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #009739;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,151,57,0.5);
+            border: none;
+        }
+        .slider-value { text-align: center; margin-top: 25px; font-size: 4.5rem; font-weight: 800; color: #009739; }
+        .radio-group { display: flex; flex-direction: column; gap: 20px; margin: 40px 0; }
+        .radio-option input { position: absolute; opacity: 0; }
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 25px 30px;
+            background: white;
+            border: 3px solid #e0e0e0;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        .radio-option input:checked + .radio-label {
+            background: linear-gradient(135deg, #009739 0%, #00b547 100%);
+            color: white;
+            border-color: #009739;
+            box-shadow: 0 6px 25px rgba(0,151,57,0.4);
+            transform: scale(1.02);
+        }
+        .radio-label:hover { border-color: #009739; }
+        .form-group { margin-bottom: 20px; }
+        textarea {
+            width: 100%;
+            padding: 18px 22px;
+            border: 3px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-family: 'Sora', sans-serif;
+            transition: all 0.3s;
+            resize: vertical;
+            min-height: 120px;
+        }
+        textarea:focus { outline: none; border-color: #009739; box-shadow: 0 0 0 4px rgba(0,151,57,0.1); }
+        .char-counter { text-align: right; font-size: 0.9rem; color: #666; margin-top: 8px; }
+        .char-counter.warning { color: #CE1126; font-weight: 700; }
+        .helper-text { font-size: 0.95rem; color: #666; margin-bottom: 15px; font-style: italic; text-align: center; }
+        .nav-buttons { 
+            display: flex; 
+            gap: 15px; 
+            margin-top: 50px; 
+            justify-content: space-between;
+        }
+        .btn {
+            padding: 18px 45px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Sora', sans-serif;
+            transition: all 0.3s;
+        }
+        .btn-prev { background: #f0f0f0; color: #333; }
+        .btn-prev:hover { background: #e0e0e0; transform: translateX(-3px); }
+        .btn-next, .btn-submit { 
+            background: linear-gradient(135deg, #009739 0%, #00b547 100%); 
+            color: white; 
+            flex-grow: 1;
+            box-shadow: 0 5px 20px rgba(0,151,57,0.3);
+        }
+        .btn-next:hover, .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,151,57,0.4); }
+        .btn:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
+        .loading { text-align: center; padding: 60px; display: none; }
+        .spinner { 
+            border: 5px solid #f3f3f3; 
+            border-top: 5px solid #009739; 
+            border-radius: 50%; 
+            width: 70px; 
+            height: 70px; 
+            animation: spin 1s linear infinite; 
+            margin: 0 auto 30px;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .message { padding: 30px; border-radius: 15px; margin-top: 30px; display: none; font-size: 1.2rem; text-align: center; }
+        .success { background: #d4edda; color: #155724; border: 3px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 3px solid #f5c6cb; }
+        @media (max-width: 768px) {
+            .container { padding: 30px 25px; }
+            h1 { font-size: 2rem; }
+            .question-text { font-size: 1.5rem; }
+            .slider-value { font-size: 3.5rem; }
+            .radio-label { font-size: 1.05rem; padding: 20px 25px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="lang-switcher">
+        <button class="lang-btn active" onclick="switchLanguage('en')" id="lang-en">EN</button>
+        <button class="lang-btn" onclick="switchLanguage('fr')" id="lang-fr">FR</button>
+    </div>
+    
+    <div class="container">
+        <div class="header">
+            <h1 data-en="🌍 Priority Assessment" data-fr="🌍 Évaluation des Priorités">🌍 Priority Assessment</h1>
+            <p class="subtitle" data-en="Your Voice Matters • Project C" data-fr="Votre Voix Compte • Projet C">Your Voice Matters • Project C</p>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+        <form id="pollForm">
+            <!-- Step 1: Confidence -->
+            <div class="step active" data-step="1">
+                <div class="question-header">
+                    <div class="question-text" 
+                         data-en="How confident are you that the diaspora can drive real change?"
+                         data-fr="À quel point êtes-vous confiant que la diaspora peut conduire un véritable changement ?">
+                        How confident are you that the diaspora can drive real change?
+                    </div>
+                </div>
+                <div class="slider-container">
+                    <div class="slider-labels">
+                        <span data-en="Not Confident" data-fr="Pas Confiant">Not Confident</span>
+                        <span data-en="Very Confident" data-fr="Très Confiant">Very Confident</span>
+                    </div>
+                    <input type="range" id="confidence" min="1" max="10" value="5" oninput="updateSlider(this.value)">
+                    <div class="slider-value" id="sliderValue">5</div>
+                </div>
+                <div class="nav-buttons">
+                    <button type="button" class="btn btn-next" onclick="nextStep()">
+                        <span data-en="Next →" data-fr="Suivant →">Next →</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Priority Pillar -->
+            <div class="step" data-step="2">
+                <div class="question-header">
+                    <div class="question-text" 
+                         data-en="Which pillar matters MOST to you?"
+                         data-fr="Quel pilier est le PLUS important pour vous ?">
+                        Which pillar matters MOST to you?
+                    </div>
+                </div>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" name="pillar" value="Governance & Institutional Reform" id="p1">
+                        <label for="p1" class="radio-label">
+                            <span data-en="🟢 Governance & Institutional Reform" data-fr="🟢 Gouvernance & Réforme Institutionnelle">🟢 Governance & Institutional Reform</span>
+                        </label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="pillar" value="Social Cohesion & Community Engagement" id="p2">
+                        <label for="p2" class="radio-label">
+                            <span data-en="🔵 Social Cohesion & Community Engagement" data-fr="🔵 Cohésion Sociale & Engagement Communautaire">🔵 Social Cohesion & Community Engagement</span>
+                        </label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="pillar" value="International Outreach & Advocacy" id="p3">
+                        <label for="p3" class="radio-label">
+                            <span data-en="🟡 International Outreach & Advocacy" data-fr="🟡 Plaidoyer & Sensibilisation Internationale">🟡 International Outreach & Advocacy</span>
+                        </label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" name="pillar" value="Economic & Reconstruction Planning" id="p4">
+                        <label for="p4" class="radio-label">
+                            <span data-en="🔴 Economic & Reconstruction Planning" data-fr="🔴 Planification Économique & Reconstruction">🔴 Economic & Reconstruction Planning</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="nav-buttons">
+                    <button type="button" class="btn btn-prev" onclick="prevStep()">
+                        <span data-en="← Back" data-fr="← Retour">← Back</span>
+                    </button>
+                    <button type="button" class="btn btn-next" onclick="nextStep()">
+                        <span data-en="Next →" data-fr="Suivant →">Next →</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Topics -->
+            <div class="step" data-step="3">
+                <div class="question-header">
+                    <div class="question-text" 
+                         data-en="What other topics would you like us to cover in future discussions?"
+                         data-fr="Quels autres sujets aimeriez-vous que nous abordions dans les discussions futures ?">
+                        What other topics would you like us to cover in future discussions?
+                    </div>
+                </div>
+                <div class="helper-text" 
+                     data-en="Optional - Maximum 100 characters"
+                     data-fr="Optionnel - Maximum 100 caractères">
+                    Optional - Maximum 100 characters
+                </div>
+                <div class="form-group">
+                    <textarea id="topics" maxlength="100" 
+                              oninput="updateCharCount()"
+                              data-placeholder-en="E.g., Youth engagement, asset recovery, transitional justice..."
+                              data-placeholder-fr="Ex : Engagement des jeunes, recouvrement d'actifs, justice transitionnelle..."
+                              placeholder="E.g., Youth engagement, asset recovery, transitional justice..."></textarea>
+                    <div class="char-counter" id="charCounter">0 / 100</div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button type="button" class="btn btn-prev" onclick="prevStep()">
+                        <span data-en="← Back" data-fr="← Retour">← Back</span>
+                    </button>
+                    <button type="submit" class="btn btn-submit">
+                        <span data-en="✅ Submit" data-fr="✅ Soumettre">✅ Submit</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="color: #666; font-weight: 600; font-size: 1.3rem;" 
+               data-en="Submitting your response..."
+               data-fr="Soumission de votre réponse...">Submitting your response...</p>
+        </div>
+
+        <div class="message" id="message"></div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZW73O34AQDahI2YEqTWdilyOirLwWQiFT5sGUjKoZNIkfEtYJIJMe6Bc_ffC2S7xCig/exec';
+        let currentLang = 'en';
+        let currentStep = 1;
+
+        function updateSlider(value) {
+            document.getElementById('sliderValue').textContent = value;
+        }
+
+        function updateCharCount() {
+            const textarea = document.getElementById('topics');
+            const counter = document.getElementById('charCounter');
+            const count = textarea.value.length;
+            counter.textContent = count + ' / 100';
+            if (count >= 90) {
+                counter.classList.add('warning');
+            } else {
+                counter.classList.remove('warning');
+            }
+        }
+
+        function updateProgress() {
+            const progress = (currentStep / 3) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function nextStep() {
+            if (currentStep === 2) {
+                const pillarSelected = document.querySelector('input[name="pillar"]:checked');
+                if (!pillarSelected) {
+                    alert(currentLang === 'en' 
+                        ? '⚠️ Please select a pillar before continuing.' 
+                        : '⚠️ Veuillez sélectionner un pilier avant de continuer.');
+                    return;
+                }
+            }
+
+            document.querySelector(`.step[data-step="${currentStep}"]`).classList.remove('active');
+            currentStep++;
+            document.querySelector(`.step[data-step="${currentStep}"]`).classList.add('active');
+            updateProgress();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function prevStep() {
+            document.querySelector(`.step[data-step="${currentStep}"]`).classList.remove('active');
+            currentStep--;
+            document.querySelector(`.step[data-step="${currentStep}"]`).classList.add('active');
+            updateProgress();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('lang-' + lang).classList.add('active');
+            document.querySelectorAll('[data-en]').forEach(el => {
+                const text = el.getAttribute('data-' + lang);
+                if (el.tagName === 'SPAN' || el.tagName === 'P') el.textContent = text;
+                else el.textContent = text;
+            });
+            document.querySelectorAll('[data-placeholder-en]').forEach(input => {
+                input.placeholder = input.getAttribute('data-placeholder-' + lang);
+            });
+        }
+
+        document.getElementById('pollForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const pillarSelected = document.querySelector('input[name="pillar"]:checked');
+            if (!pillarSelected) {
+                alert(currentLang === 'en' 
+                    ? '⚠️ Please select a pillar before submitting.' 
+                    : '⚠️ Veuillez sélectionner un pilier avant de soumettre.');
+                return false;
+            }
+
+            const form = document.getElementById('pollForm');
+            const loading = document.getElementById('loading');
+            const message = document.getElementById('message');
+            const submitBtn = document.querySelector('.btn-submit');
+
+            form.style.display = 'none';
+            loading.style.display = 'block';
+            submitBtn.disabled = true;
+
+            const data = {
+                surveyId: 'priority_poll_2026',
+                q1: document.getElementById('confidence').value,
+                q2: pillarSelected.value,
+                q3: document.getElementById('topics').value.trim() || 'N/A',
+                language: currentLang
+            };
+
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                loading.style.display = 'none';
+                message.style.display = 'block';
+
+                if (result.success) {
+                    message.className = 'message success';
+                    message.innerHTML = `<h2 style="margin-bottom: 20px; font-size: 2rem;">${currentLang === 'en' ? '✅ Response Recorded!' : '✅ Réponse Enregistrée !'}</h2>
+                        <p style="font-size: 1.3rem;">${currentLang === 'en' ? 'Thank you for sharing your priorities!' : 'Merci de partager vos priorités !'}</p>`;
+                } else {
+                    message.className = 'message error';
+                    message.innerHTML = `<h2 style="margin-bottom: 20px; font-size: 2rem;">${currentLang === 'en' ? '❌ Error' : '❌ Erreur'}</h2><p>${result.error}</p>`;
+                    form.style.display = 'block';
+                    submitBtn.disabled = false;
+                }
+            } catch (error) {
+                loading.style.display = 'none';
+                message.style.display = 'block';
+                message.className = 'message error';
+                message.innerHTML = `<h2 style="margin-bottom: 20px; font-size: 2rem;">${currentLang === 'en' ? '❌ Error' : '❌ Erreur'}</h2><p>${error.message}</p>`;
+                form.style.display = 'block';
+                submitBtn.disabled = false;
+            }
+        });
+
+        updateProgress();
+    </script>
+</body>
+</html>
