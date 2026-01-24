@@ -166,65 +166,6 @@
             height: 350px;
         }
 
-        .responses-section {
-            background: linear-gradient(135deg, #1a1f3a 0%, #2a2f4a 100%);
-            padding: 30px;
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 40px;
-        }
-
-        .responses-section h2 {
-            margin-bottom: 25px;
-            font-size: 1.5rem;
-        }
-
-        .table-wrapper {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 800px;
-        }
-
-        thead {
-            background: rgba(0,151,57,0.2);
-        }
-
-        th {
-            padding: 15px;
-            text-align: left;
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 0.85rem;
-            letter-spacing: 1px;
-            color: rgba(255,255,255,0.9);
-            border-bottom: 2px solid rgba(0,151,57,0.5);
-        }
-
-        td {
-            padding: 15px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            color: rgba(255,255,255,0.8);
-        }
-
-        tr:hover {
-            background: rgba(0,151,57,0.1);
-        }
-
-        .commitment-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            margin: 2px;
-            background: rgba(0,151,57,0.3);
-            border: 1px solid rgba(0,151,57,0.5);
-            border-radius: 12px;
-            font-size: 0.75rem;
-            color: #00ff7f;
-        }
-
         .other-responses {
             background: linear-gradient(135deg, #1a1f3a 0%, #2a2f4a 100%);
             padding: 30px;
@@ -307,10 +248,6 @@
             .stat-value {
                 font-size: 2.5rem;
             }
-
-            table {
-                font-size: 0.85rem;
-            }
         }
     </style>
 </head>
@@ -386,26 +323,6 @@
                 <div id="otherList"></div>
             </div>
 
-            <div class="responses-section">
-                <h2 data-en="📋 Individual Responses" data-fr="📋 Réponses Individuelles">📋 Individual Responses</h2>
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th data-en="Name" data-fr="Nom">Name</th>
-                                <th>Email</th>
-                                <th data-en="Confidence" data-fr="Confiance">Confidence</th>
-                                <th data-en="Top Pillar" data-fr="Pilier Principal">Top Pillar</th>
-                                <th data-en="Commitments" data-fr="Engagements">Commitments</th>
-                            </tr>
-                        </thead>
-                        <tbody id="responsesTable">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
             <div class="last-updated">
                 <span data-en="Last updated:" data-fr="Dernière mise à jour :">Last updated:</span> <span id="lastUpdated"></span> • 
                 <span data-en="Auto-refreshes every 30 seconds" data-fr="Actualisation automatique toutes les 30 secondes">Auto-refreshes every 30 seconds</span>
@@ -422,6 +339,27 @@
         
         let currentLang = 'en';
         let pillarChart, commitmentChart, confidenceChart;
+
+        const translations = {
+            en: {
+                responses: 'Responses',
+                question1: 'Question 1',
+                question2: 'Question 2',
+                question3: 'Question 3',
+                q1Label: 'Q1: Shared Objective',
+                q2Label: 'Q2: Coordination',
+                q3Label: 'Q3: Framework'
+            },
+            fr: {
+                responses: 'Réponses',
+                question1: 'Question 1',
+                question2: 'Question 2',
+                question3: 'Question 3',
+                q1Label: 'Q1: Objectif Partagé',
+                q2Label: 'Q2: Coordination',
+                q3Label: 'Q3: Cadre'
+            }
+        };
 
         function switchLanguage(lang) {
             currentLang = lang;
@@ -443,10 +381,19 @@
         }
 
         function updateChartLabels() {
-            // Update chart labels based on language
-            if (pillarChart) pillarChart.update();
-            if (commitmentChart) commitmentChart.update();
-            if (confidenceChart) confidenceChart.update();
+            const t = translations[currentLang];
+            
+            // Update commitment chart
+            if (commitmentChart) {
+                commitmentChart.data.datasets[0].label = t.responses;
+                commitmentChart.update();
+            }
+
+            // Update confidence chart
+            if (confidenceChart) {
+                confidenceChart.data.datasets[0].label = t.responses;
+                confidenceChart.update();
+            }
         }
 
         async function loadResults() {
@@ -469,7 +416,6 @@
         }
 
         function displayResults(data) {
-            // Calculate statistics
             const totalResponses = data.responses.length;
             const avgConfidence = totalResponses > 0 
                 ? (data.responses.reduce((sum, r) => sum + parseInt(r.q1), 0) / totalResponses).toFixed(1)
@@ -516,25 +462,6 @@
                     `<div class="other-item">${r.q2.replace('Other: ', '')}</div>`
                 ).join('');
             }
-
-            // Update table
-            const tbody = document.getElementById('responsesTable');
-            tbody.innerHTML = '';
-
-            data.responses.forEach((response, index) => {
-                const commitments = response.q3.split(';').map(c => c.trim()).filter(c => c);
-                const row = tbody.insertRow();
-                row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${response.name}</td>
-                    <td style="color: rgba(255,255,255,0.6); font-size: 0.85rem;">${response.email}</td>
-                    <td><strong style="color: #FCD116;">${response.q1}/10</strong></td>
-                    <td>${response.q2}</td>
-                    <td style="max-width: 300px;">
-                        ${commitments.map(c => `<span class="commitment-badge">${c}</span>`).join('')}
-                    </td>
-                `;
-            });
 
             document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
         }
@@ -598,6 +525,8 @@
                 commitmentChart.destroy();
             }
 
+            const t = translations[currentLang];
+
             // Count all commitments
             const commitmentCounts = {};
             responses.forEach(r => {
@@ -615,7 +544,7 @@
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: currentLang === 'en' ? 'Responses' : 'Réponses',
+                        label: t.responses,
                         data: data,
                         backgroundColor: 'rgba(0, 151, 57, 0.8)',
                         borderColor: 'rgba(0, 151, 57, 1)',
@@ -661,6 +590,8 @@
                 confidenceChart.destroy();
             }
 
+            const t = translations[currentLang];
+
             // Count confidence scores
             const confidenceCounts = {};
             for (let i = 1; i <= 10; i++) {
@@ -680,7 +611,7 @@
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: currentLang === 'en' ? 'Responses' : 'Réponses',
+                        label: t.responses,
                         data: data,
                         backgroundColor: 'rgba(252, 209, 22, 0.8)',
                         borderColor: 'rgba(252, 209, 22, 1)',
