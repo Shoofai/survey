@@ -226,41 +226,16 @@
             transform: scale(1.1);
         }
         .heatmap-label {
-            font-size: 0.6vw;
-            color: rgba(255,255,255,0.6);
+            font-size: 0.7vw;
+            color: #1a1f3a;
+            font-weight: 700;
+            text-shadow: none;
         }
         .heatmap-value {
-            font-size: 0.9vw;
-            color: rgba(255,255,255,0.9);
+            font-size: 1.1vw;
+            color: #0a0e27;
             font-weight: 800;
-        }
-        .engagement-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(18vw, 1fr));
-            gap: 1vw;
-        }
-        .engagement-item {
-            background: rgba(0,151,57,0.1);
-            padding: 1.2vw;
-            border-radius: 0.5vw;
-            border: 1px solid rgba(0,151,57,0.3);
-            text-align: center;
-        }
-        .engagement-name {
-            font-size: 0.75vw;
-            color: rgba(255,255,255,0.9);
-            margin-bottom: 0.5vw;
-            font-weight: 600;
-        }
-        .engagement-score {
-            font-size: 2vw;
-            font-weight: 800;
-            color: #00ff6a;
-            margin-bottom: 0.3vw;
-        }
-        .engagement-rank {
-            font-size: 0.7vw;
-            color: rgba(255,255,255,0.6);
+            text-shadow: none;
         }
         .geo-heatmap {
             display: grid;
@@ -376,10 +351,6 @@
                     <div class="metric-value" id="uniqueSkills">0</div>
                 </div>
                 <div class="metric-card">
-                    <div class="metric-label" data-en="Avg Engagement" data-fr="Engagement Moy.">Avg Engagement</div>
-                    <div class="metric-value" id="avgEngagement">0</div>
-                </div>
-                <div class="metric-card">
                     <div class="metric-label" data-en="Countries" data-fr="Pays">Countries</div>
                     <div class="metric-value" id="countryCount">0</div>
                 </div>
@@ -403,12 +374,6 @@
                 <div class="heatmap-grid" id="availabilityHeatmap"></div>
             </div>
 
-            <!-- Builder Engagement Scores -->
-            <div class="chart-card full-width">
-                <div class="chart-title" data-en="⭐ Builder Engagement Scores" data-fr="⭐ Scores d'Engagement">⭐ Builder Engagement Scores</div>
-                <div class="engagement-grid" id="engagementScores"></div>
-            </div>
-
             <!-- Geographic Heat Map -->
             <div class="chart-card full-width">
                 <div class="chart-title" data-en="🌍 Geographic Distribution" data-fr="🌍 Distribution Géographique">🌍 Geographic Distribution</div>
@@ -424,6 +389,41 @@
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZW73O34AQDahI2YEqTWdilyOirLwWQiFT5sGUjKoZNIkfEtYJIJMe6Bc_ffC2S7xCig/exec';
         let currentLang = 'en';
+        let currentResponses = []; // Store responses for re-rendering on language change
+
+        // Translation maps for dynamic Google Sheets data
+        const translations = {
+            // Common terms
+            'builders': { en: 'builders', fr: 'bâtisseurs' },
+            'builder': { en: 'builder', fr: 'bâtisseur' },
+            
+            // Skills translations
+            'Communications / Media / Content': { en: 'Communications / Media / Content', fr: 'Communications / Médias / Contenu' },
+            'Healthcare / Public Health': { en: 'Healthcare / Public Health', fr: 'Santé / Santé Publique' },
+            'Engineering / Infrastructure': { en: 'Engineering / Infrastructure', fr: 'Ingénierie / Infrastructure' },
+            'Legal / Policy / Advocacy': { en: 'Legal / Policy / Advocacy', fr: 'Juridique / Politique / Plaidoyer' },
+            'Finance / Economics / Business': { en: 'Finance / Economics / Business', fr: 'Finance / Économie / Affaires' },
+            'Technology / IT / Data': { en: 'Technology / IT / Data', fr: 'Technologie / IT / Données' },
+            'Education / Training': { en: 'Education / Training', fr: 'Éducation / Formation' },
+            'Project Management': { en: 'Project Management', fr: 'Gestion de Projet' },
+            'Research / Analysis': { en: 'Research / Analysis', fr: 'Recherche / Analyse' },
+            'Community Organizing': { en: 'Community Organizing', fr: 'Organisation Communautaire' },
+            'Fundraising / Development': { en: 'Fundraising / Development', fr: 'Collecte de Fonds' },
+            'Design / Creative': { en: 'Design / Creative', fr: 'Design / Créatif' },
+            'Translation / Interpretation': { en: 'Translation / Interpretation', fr: 'Traduction / Interprétation' },
+            'Security / Safety': { en: 'Security / Safety', fr: 'Sécurité' },
+            'Logistics / Operations': { en: 'Logistics / Operations', fr: 'Logistique / Opérations' }
+        };
+
+        function translateText(text) {
+            if (!text) return text;
+            // Check if translation exists
+            if (translations[text] && translations[text][currentLang]) {
+                return translations[text][currentLang];
+            }
+            // Return original if no translation
+            return text;
+        }
 
         function switchLanguage(lang) {
             currentLang = lang;
@@ -432,6 +432,14 @@
             document.querySelectorAll('[data-en]').forEach(el => {
                 el.textContent = el.getAttribute('data-' + lang);
             });
+            
+            // Reload visualizations with new language if data exists
+            if (currentResponses.length > 0) {
+                createSkillsRanking(currentResponses);
+                createSkillCombinations(currentResponses);
+                createAvailabilityHeatmap(currentResponses);
+                createGeoHeatmap(currentResponses);
+            }
         }
 
         async function loadData() {
@@ -451,6 +459,7 @@
         }
 
         function processData(responses) {
+            currentResponses = responses; // Store for language switching
             document.getElementById('totalBuilders').textContent = responses.length;
 
             // Calculate total hours
@@ -483,20 +492,10 @@
             });
             document.getElementById('countryCount').textContent = countries.size;
 
-            // Average engagement score
-            const avgScore = responses.reduce((sum, r) => {
-                const hours = hourMap[r['Q3 (Hours)']] || 0;
-                const skills = (r['Q2 (Skills)'] || '').split(';').filter(s => s.trim()).length;
-                const pillars = (r['Q1 (Pillars)'] || '').split(';').filter(p => p.trim()).length;
-                return sum + (hours + skills * 2 + pillars * 3);
-            }, 0) / responses.length;
-            document.getElementById('avgEngagement').textContent = avgScore.toFixed(0);
-
             // Create visualizations
             createSkillsRanking(responses);
             createSkillCombinations(responses);
             createAvailabilityHeatmap(responses);
-            createEngagementScores(responses);
             createGeoHeatmap(responses);
         }
 
@@ -520,14 +519,16 @@
             
             container.innerHTML = sorted.map(([skill, count], i) => {
                 const pct = (count / maxCount * 100).toFixed(0);
+                const translatedSkill = translateText(skill);
+                const displaySkill = translatedSkill.length > 50 ? translatedSkill.substring(0, 47) + '...' : translatedSkill;
                 return `
                     <div class="skill-rank-item">
                         <div class="skill-rank">${i + 1}</div>
-                        <div class="skill-name">${skill.length > 50 ? skill.substring(0, 47) + '...' : skill}</div>
+                        <div class="skill-name">${displaySkill}</div>
                         <div class="skill-bar">
                             <div class="skill-fill" style="width: ${pct}%"></div>
                         </div>
-                        <div class="skill-count">${count} ${currentLang === 'en' ? 'builders' : 'bâtisseurs'}</div>
+                        <div class="skill-count">${count} ${translateText('builders')}</div>
                     </div>
                 `;
             }).join('');
@@ -552,12 +553,17 @@
                 .slice(0, 8);
 
             const container = document.getElementById('skillCombos');
-            container.innerHTML = sorted.map(([combo, count]) => `
-                <div class="combo-item">
-                    <div class="combo-skills">${combo}</div>
-                    <div class="combo-count">${count} ${currentLang === 'en' ? 'builders' : 'bâtisseurs'}</div>
-                </div>
-            `).join('');
+            container.innerHTML = sorted.map(([combo, count]) => {
+                // Translate each skill in the combination
+                const skills = combo.split(' + ').map(s => translateText(s.trim()));
+                const translatedCombo = skills.join(' + ');
+                return `
+                    <div class="combo-item">
+                        <div class="combo-skills">${translatedCombo}</div>
+                        <div class="combo-count">${count} ${translateText('builders')}</div>
+                    </div>
+                `;
+            }).join('');
         }
 
         function createAvailabilityHeatmap(responses) {
@@ -594,37 +600,6 @@
                     </div>
                 `;
             }).join('');
-        }
-
-        function createEngagementScores(responses) {
-            const hourMap = {
-                '1-5 hours': 3,
-                '5-10 hours': 7.5,
-                '10-20 hours': 15,
-                '20+ hours': 25,
-                'Support only': 0
-            };
-
-            const builders = responses.map((r, i) => {
-                const hours = hourMap[r['Q3 (Hours)']] || 0;
-                const skills = (r['Q2 (Skills)'] || '').split(';').filter(s => s.trim()).length;
-                const pillars = (r['Q1 (Pillars)'] || '').split(';').filter(p => p.trim()).length;
-                const score = hours + (skills * 2) + (pillars * 3);
-                
-                return {
-                    name: r['Name'] || `Builder ${i + 1}`,
-                    score: score
-                };
-            }).sort((a, b) => b.score - a.score).slice(0, 8);
-
-            const container = document.getElementById('engagementScores');
-            container.innerHTML = builders.map((b, i) => `
-                <div class="engagement-item">
-                    <div class="engagement-name">${b.name}</div>
-                    <div class="engagement-score">${Math.round(b.score)}</div>
-                    <div class="engagement-rank">${currentLang === 'en' ? 'Rank' : 'Rang'} #${i + 1}</div>
-                </div>
-            `).join('');
         }
 
         function createGeoHeatmap(responses) {

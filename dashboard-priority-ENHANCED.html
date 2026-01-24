@@ -344,7 +344,38 @@
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZW73O34AQDahI2YEqTWdilyOirLwWQiFT5sGUjKoZNIkfEtYJIJMe6Bc_ffC2S7xCig/exec';
         let currentLang = 'en';
+        let currentResponses = []; // Store responses for re-rendering
         let charts = {};
+
+        // Translation maps for pillar names
+        const translations = {
+            'Governance & Institutional Reform': { 
+                en: 'Governance & Institutional Reform', 
+                fr: 'Gouvernance & Réforme Institutionnelle' 
+            },
+            'Social Cohesion & Community Building': { 
+                en: 'Social Cohesion & Community Building', 
+                fr: 'Cohésion Sociale & Construction Communautaire' 
+            },
+            'International Outreach & Advocacy': { 
+                en: 'International Outreach & Advocacy', 
+                fr: 'Plaidoyer & Sensibilisation Internationale' 
+            },
+            'Economic Recovery & Reconstruction': { 
+                en: 'Economic Recovery & Reconstruction', 
+                fr: 'Relance Économique & Reconstruction' 
+            },
+            'responses': { en: 'responses', fr: 'réponses' },
+            'votes': { en: 'votes', fr: 'votes' }
+        };
+
+        function translateText(text) {
+            if (!text) return text;
+            if (translations[text] && translations[text][currentLang]) {
+                return translations[text][currentLang];
+            }
+            return text;
+        }
 
         function switchLanguage(lang) {
             currentLang = lang;
@@ -353,6 +384,15 @@
             document.querySelectorAll('[data-en]').forEach(el => {
                 el.textContent = el.getAttribute('data-' + lang);
             });
+            
+            // Reload visualizations with new language if data exists
+            if (currentResponses.length > 0) {
+                const confidences = currentResponses.map(r => parseInt(r['Q1 (Confidence)'] || 0));
+                createConfDistChart(confidences);
+                createConfChart(confidences);
+                createPillarRanking(currentResponses);
+                createGeoDistribution(currentResponses);
+            }
         }
 
         async function loadData() {
@@ -372,6 +412,7 @@
         }
 
         function processData(responses) {
+            currentResponses = responses; // Store for language switching
             document.getElementById('totalCount').textContent = responses.length;
 
             // Confidence metrics
@@ -491,18 +532,14 @@
             
             container.innerHTML = sorted.map(([pillar, count], i) => {
                 const pct = ((count / total) * 100).toFixed(1);
-                const shortName = pillar.includes('Governance') ? (currentLang === 'en' ? 'Governance & Institutional Reform' : 'Gouvernance & Réforme Institutionnelle')
-                    : pillar.includes('Social') ? (currentLang === 'en' ? 'Social Cohesion & Community' : 'Cohésion Sociale & Communauté')
-                    : pillar.includes('International') ? (currentLang === 'en' ? 'International Outreach & Advocacy' : 'Plaidoyer International')
-                    : pillar.includes('Economic') ? (currentLang === 'en' ? 'Economic & Reconstruction' : 'Économique & Reconstruction')
-                    : pillar;
+                const translatedName = translateText(pillar);
                 
                 return `
                     <div class="pillar-rank-item">
                         <div class="rank-number">${icons[i] || (i+1)}</div>
                         <div class="pillar-info">
-                            <div class="pillar-name">${shortName}</div>
-                            <div class="pillar-stats">${count} ${currentLang === 'en' ? 'responses' : 'réponses'} (${pct}%)</div>
+                            <div class="pillar-name">${translatedName}</div>
+                            <div class="pillar-stats">${count} ${translateText('responses')} (${pct}%)</div>
                         </div>
                         <div class="pillar-bar">
                             <div class="pillar-fill" style="width: ${pct}%"></div>
