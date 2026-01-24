@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Priority Poll - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Sora', sans-serif; 
+            background: #0a0e27;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            height: 80vh;
+            background: linear-gradient(135deg, #1a1f3a 0%, #0f1729 100%);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            overflow-y: auto;
+            border: 1px solid rgba(0,151,57,0.2);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        .header-left h1 { 
+            color: #00ff6a;
+            font-size: 2.5rem; 
+            font-weight: 800; 
+            margin-bottom: 5px;
+            text-shadow: 0 0 20px rgba(0,255,106,0.3);
+        }
+        .subtitle {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.7);
+        }
+        .lang-switcher {
+            position: absolute;
+            top: 30px;
+            right: 170px;
+            display: flex;
+            gap: 5px;
+            background: rgba(255,255,255,0.05);
+            padding: 5px;
+            border-radius: 50px;
+            border: 1px solid rgba(0,151,57,0.3);
+            z-index: 1000;
+        }
+        .lang-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 700;
+            background: transparent;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Sora', sans-serif;
+        }
+        .lang-btn.active {
+            background: #009739;
+            color: white;
+        }
+        .back-btn {
+            padding: 12px 25px;
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 700;
+            transition: all 0.3s;
+            border: 1px solid rgba(0,151,57,0.3);
+        }
+        .back-btn:hover {
+            background: rgba(0,151,57,0.2);
+            border-color: #00ff6a;
+            transform: translateX(-3px);
+        }
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-box {
+            background: linear-gradient(135deg, rgba(0,151,57,0.1) 0%, rgba(0,151,57,0.05) 100%);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            border-left: 4px solid #00ff6a;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+            border: 1px solid rgba(0,151,57,0.3);
+        }
+        .stat-label {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #00ff6a;
+            text-shadow: 0 0 20px rgba(0,255,106,0.3);
+        }
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        .chart-card {
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border: 1px solid rgba(0,151,57,0.2);
+        }
+        .chart-card.full-width {
+            grid-column: 1 / -1;
+        }
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .pillar-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .pillar-item {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #00ff6a;
+        }
+        .pillar-name {
+            font-weight: 700;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        .pillar-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+        .pillar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #009739 0%, #00ff6a 100%);
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(0,255,106,0.5);
+        }
+        .pillar-count {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
+        }
+        .topics-section {
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            border: 1px solid rgba(0,151,57,0.2);
+        }
+        .topics-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #00ff6a;
+            margin-bottom: 15px;
+        }
+        .topics-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .topic-tag {
+            background: rgba(0,151,57,0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.9);
+            border: 1px solid rgba(0,151,57,0.4);
+            font-weight: 600;
+        }
+        .loading {
+            text-align: center;
+            padding: 60px;
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.7);
+        }
+        .spinner {
+            border: 5px solid rgba(255,255,255,0.1);
+            border-top: 5px solid #00ff6a;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .refresh-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #009739 0%, #00ff6a 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0,255,106,0.4);
+            transition: all 0.3s;
+            font-family: 'Sora', sans-serif;
+        }
+        .refresh-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 30px rgba(0,255,106,0.6);
+        }
+        @media (max-width: 1024px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+            }
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .lang-switcher {
+                top: 15px;
+                right: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="lang-switcher">
+        <button class="lang-btn active" onclick="switchLanguage('en')" id="lang-en">EN</button>
+        <button class="lang-btn" onclick="switchLanguage('fr')" id="lang-fr">FR</button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <h1 data-en="🌍 Priority Assessment" data-fr="🌍 Évaluation des Priorités">🌍 Priority Assessment</h1>
+                <p class="subtitle" data-en="Diaspora Confidence & Pillar Priorities" data-fr="Confiance de la Diaspora & Priorités">Diaspora Confidence & Pillar Priorities</p>
+            </div>
+            <a href="dashboard-overview-DARK.html" class="back-btn" data-en="← Back to Overview" data-fr="← Retour à l'Aperçu">← Back to Overview</a>
+        </div>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p data-en="Loading priority data..." data-fr="Chargement des données prioritaires...">Loading priority data...</p>
+        </div>
+
+        <div id="content" style="display: none;">
+            <!-- Stats Row -->
+            <div class="stats-row">
+                <div class="stat-box">
+                    <div class="stat-label" data-en="Total Responses" data-fr="Réponses Totales">Total Responses</div>
+                    <div class="stat-value" id="totalCount">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label" data-en="Avg Confidence" data-fr="Confiance Moy.">Avg Confidence</div>
+                    <div class="stat-value" id="avgConfidence">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">English</div>
+                    <div class="stat-value" id="englishCount">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Français</div>
+                    <div class="stat-value" id="frenchCount">0</div>
+                </div>
+            </div>
+
+            <!-- Charts Grid -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-title" data-en="Confidence Distribution" data-fr="Distribution de Confiance">Confidence Distribution</div>
+                    <canvas id="confidenceChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-title" data-en="Priority Pillars" data-fr="Piliers Prioritaires">Priority Pillars</div>
+                    <canvas id="pillarChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Pillar Breakdown -->
+            <div class="chart-card full-width">
+                <div class="chart-title" data-en="Detailed Pillar Breakdown" data-fr="Répartition Détaillée des Piliers">Detailed Pillar Breakdown</div>
+                <div class="pillar-breakdown" id="pillarBreakdown"></div>
+            </div>
+
+            <!-- Topics Section -->
+            <div class="topics-section">
+                <div class="topics-title" data-en="💡 Suggested Topics for Discussion" data-fr="💡 Sujets Suggérés pour Discussion">💡 Suggested Topics for Discussion</div>
+                <div class="topics-list" id="topicsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <button class="refresh-btn" onclick="loadData()">
+        <span data-en="🔄 Refresh" data-fr="🔄 Actualiser">🔄 Refresh</span>
+    </button>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZW73O34AQDahI2YEqTWdilyOirLwWQiFT5sGUjKoZNIkfEtYJIJMe6Bc_ffC2S7xCig/exec';
+        let currentLang = 'en';
+        let confidenceChart, pillarChart;
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('lang-' + lang).classList.add('active');
+            
+            document.querySelectorAll('[data-en]').forEach(el => {
+                const text = el.getAttribute('data-' + lang);
+                el.textContent = text;
+            });
+        }
+
+        async function loadData() {
+            try {
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('content').style.display = 'none';
+
+                const response = await fetch(SCRIPT_URL + '?survey=priority_poll_2026');
+                const data = await response.json();
+                const responses = data.responses || [];
+
+                processData(responses);
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+
+            } catch (error) {
+                console.error('Error loading data:', error);
+                alert('Error loading data. Please check console.');
+            }
+        }
+
+        function processData(responses) {
+            document.getElementById('totalCount').textContent = responses.length;
+
+            const avgConf = responses.length > 0 
+                ? responses.reduce((sum, r) => sum + parseInt(r['Q1 (Confidence)'] || 0), 0) / responses.length
+                : 0;
+            document.getElementById('avgConfidence').textContent = avgConf.toFixed(1);
+
+            const langCount = { en: 0, fr: 0 };
+            responses.forEach(r => {
+                const lang = r.Language || 'en';
+                langCount[lang]++;
+            });
+            document.getElementById('englishCount').textContent = langCount.en;
+            document.getElementById('frenchCount').textContent = langCount.fr;
+
+            createConfidenceChart(responses);
+            createPillarChart(responses);
+            createPillarBreakdown(responses);
+            displayTopics(responses);
+        }
+
+        function createConfidenceChart(responses) {
+            const ctx = document.getElementById('confidenceChart').getContext('2d');
+            if (confidenceChart) confidenceChart.destroy();
+
+            const confidenceCounts = {};
+            for (let i = 1; i <= 10; i++) confidenceCounts[i] = 0;
+            
+            responses.forEach(r => {
+                const conf = parseInt(r['Q1 (Confidence)'] || 0);
+                if (conf >= 1 && conf <= 10) confidenceCounts[conf]++;
+            });
+
+            confidenceChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(confidenceCounts),
+                    datasets: [{
+                        label: currentLang === 'en' ? 'Responses' : 'Réponses',
+                        data: Object.values(confidenceCounts),
+                        backgroundColor: '#00ff6a',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { 
+                            display: false,
+                            labels: { color: 'rgba(255,255,255,0.9)' }
+                        }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            ticks: { color: 'rgba(255,255,255,0.7)' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        },
+                        x: {
+                            ticks: { color: 'rgba(255,255,255,0.7)' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createPillarChart(responses) {
+            const ctx = document.getElementById('pillarChart').getContext('2d');
+            if (pillarChart) pillarChart.destroy();
+
+            const pillarCounts = {};
+            responses.forEach(r => {
+                const pillar = r['Q2 (Pillar)'];
+                if (pillar) pillarCounts[pillar] = (pillarCounts[pillar] || 0) + 1;
+            });
+
+            const colors = {
+                'Governance & Institutional Reform': '#00ff6a',
+                'Social Cohesion & Community Engagement': '#0066cc',
+                'International Outreach & Advocacy': '#FCD116',
+                'Economic & Reconstruction Planning': '#CE1126'
+            };
+
+            pillarChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(pillarCounts),
+                    datasets: [{
+                        data: Object.values(pillarCounts),
+                        backgroundColor: Object.keys(pillarCounts).map(k => colors[k] || '#999'),
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                font: { size: 11 },
+                                color: 'rgba(255,255,255,0.9)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createPillarBreakdown(responses) {
+            const pillarCounts = {};
+            const total = responses.length;
+
+            responses.forEach(r => {
+                const pillar = r['Q2 (Pillar)'];
+                if (pillar) pillarCounts[pillar] = (pillarCounts[pillar] || 0) + 1;
+            });
+
+            const container = document.getElementById('pillarBreakdown');
+            container.innerHTML = '';
+
+            const pillars = [
+                { name: 'Governance & Institutional Reform', icon: '🟢' },
+                { name: 'Social Cohesion & Community Engagement', icon: '🔵' },
+                { name: 'International Outreach & Advocacy', icon: '🟡' },
+                { name: 'Economic & Reconstruction Planning', icon: '🔴' }
+            ];
+
+            pillars.forEach(pillar => {
+                const count = pillarCounts[pillar.name] || 0;
+                const percent = total > 0 ? (count / total * 100).toFixed(1) : 0;
+
+                const item = document.createElement('div');
+                item.className = 'pillar-item';
+                item.innerHTML = `
+                    <div class="pillar-name">${pillar.icon} ${pillar.name}</div>
+                    <div class="pillar-bar">
+                        <div class="pillar-fill" style="width: ${percent}%"></div>
+                    </div>
+                    <div class="pillar-count">${count} ${currentLang === 'en' ? 'responses' : 'réponses'} (${percent}%)</div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function displayTopics(responses) {
+            const topicsList = document.getElementById('topicsList');
+            topicsList.innerHTML = '';
+
+            const topicsSet = new Set();
+            responses.forEach(r => {
+                const topics = r['Q3 (Topics)'];
+                if (topics && topics !== 'N/A' && topics.trim()) {
+                    topics.split(/[,;]/).forEach(topic => {
+                        const cleaned = topic.trim();
+                        if (cleaned && cleaned.length > 2) {
+                            topicsSet.add(cleaned);
+                        }
+                    });
+                }
+            });
+
+            if (topicsSet.size === 0) {
+                topicsList.innerHTML = `<p style="color: rgba(255,255,255,0.6);">${currentLang === 'en' ? 'No topics suggested yet' : 'Aucun sujet suggéré'}</p>`;
+                return;
+            }
+
+            Array.from(topicsSet).forEach(topic => {
+                const tag = document.createElement('div');
+                tag.className = 'topic-tag';
+                tag.textContent = topic;
+                topicsList.appendChild(tag);
+            });
+        }
+
+        loadData();
+    </script>
+</body>
+</html>

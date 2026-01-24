@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Builder Poll - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Sora', sans-serif; 
+            background: #0a0e27;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            height: 80vh;
+            background: linear-gradient(135deg, #1a1f3a 0%, #0f1729 100%);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            overflow-y: auto;
+            border: 1px solid rgba(0,151,57,0.2);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        .header-left h1 { 
+            color: #00ff6a;
+            font-size: 2.5rem; 
+            font-weight: 800; 
+            margin-bottom: 5px;
+            text-shadow: 0 0 20px rgba(0,255,106,0.3);
+        }
+        .subtitle {
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.7);
+        }
+        .lang-switcher {
+            position: absolute;
+            top: 30px;
+            right: 170px;
+            display: flex;
+            gap: 5px;
+            background: rgba(255,255,255,0.05);
+            padding: 5px;
+            border-radius: 50px;
+            border: 1px solid rgba(0,151,57,0.3);
+            z-index: 1000;
+        }
+        .lang-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 700;
+            background: transparent;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Sora', sans-serif;
+        }
+        .lang-btn.active {
+            background: #009739;
+            color: white;
+        }
+        .back-btn {
+            padding: 12px 25px;
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 700;
+            transition: all 0.3s;
+            border: 1px solid rgba(0,151,57,0.3);
+        }
+        .back-btn:hover {
+            background: rgba(0,151,57,0.2);
+            border-color: #00ff6a;
+            transform: translateX(-3px);
+        }
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-box {
+            background: linear-gradient(135deg, rgba(0,151,57,0.1) 0%, rgba(0,151,57,0.05) 100%);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            border-left: 4px solid #00ff6a;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+            border: 1px solid rgba(0,151,57,0.3);
+        }
+        .stat-label {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #00ff6a;
+            text-shadow: 0 0 20px rgba(0,255,106,0.3);
+        }
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        .chart-card {
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border: 1px solid rgba(0,151,57,0.2);
+        }
+        .chart-card.full-width {
+            grid-column: 1 / -1;
+        }
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .skills-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .skill-item {
+            background: rgba(255,255,255,0.05);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #00ff6a;
+        }
+        .skill-name {
+            font-weight: 700;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        .skill-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+        .skill-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #009739 0%, #00ff6a 100%);
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(0,255,106,0.5);
+        }
+        .skill-count {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
+        }
+        .location-section {
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            border: 1px solid rgba(0,151,57,0.2);
+        }
+        .location-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #00ff6a;
+            margin-bottom: 15px;
+        }
+        .location-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        .location-item {
+            background: rgba(0,151,57,0.1);
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.9);
+            border: 1px solid rgba(0,151,57,0.3);
+            font-weight: 600;
+        }
+        .location-flag {
+            margin-right: 8px;
+        }
+        .loading {
+            text-align: center;
+            padding: 60px;
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.7);
+        }
+        .spinner {
+            border: 5px solid rgba(255,255,255,0.1);
+            border-top: 5px solid #00ff6a;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .refresh-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #009739 0%, #00ff6a 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0,255,106,0.4);
+            transition: all 0.3s;
+            font-family: 'Sora', sans-serif;
+        }
+        .refresh-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 30px rgba(0,255,106,0.6);
+        }
+        @media (max-width: 1024px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+            }
+            .header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .lang-switcher {
+                top: 15px;
+                right: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="lang-switcher">
+        <button class="lang-btn active" onclick="switchLanguage('en')" id="lang-en">EN</button>
+        <button class="lang-btn" onclick="switchLanguage('fr')" id="lang-fr">FR</button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <h1 data-en="💪 Builder Commitments" data-fr="💪 Engagements Bâtisseurs">💪 Builder Commitments</h1>
+                <p class="subtitle" data-en="Skills, Time & Geographic Distribution" data-fr="Compétences, Temps & Distribution Géographique">Skills, Time & Geographic Distribution</p>
+            </div>
+            <a href="dashboard-overview-DARK.html" class="back-btn" data-en="← Back to Overview" data-fr="← Retour à l'Aperçu">← Back to Overview</a>
+        </div>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p data-en="Loading builder data..." data-fr="Chargement des données bâtisseurs...">Loading builder data...</p>
+        </div>
+
+        <div id="content" style="display: none;">
+            <!-- Stats Row -->
+            <div class="stats-row">
+                <div class="stat-box">
+                    <div class="stat-label" data-en="Total Builders" data-fr="Bâtisseurs Totaux">Total Builders</div>
+                    <div class="stat-value" id="totalCount">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label" data-en="Total Hours/Month" data-fr="Heures Totales/Mois">Total Hours/Month</div>
+                    <div class="stat-value" id="totalHours">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label" data-en="Countries" data-fr="Pays">Countries</div>
+                    <div class="stat-value" id="countryCount">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label" data-en="Skill Areas" data-fr="Domaines">Skill Areas</div>
+                    <div class="stat-value" id="skillCount">0</div>
+                </div>
+            </div>
+
+            <!-- Charts Grid -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-title" data-en="Time Commitment" data-fr="Engagement Temporel">Time Commitment</div>
+                    <canvas id="hoursChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-title" data-en="Top Pillars" data-fr="Piliers Principaux">Top Pillars</div>
+                    <canvas id="pillarChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Skills Breakdown -->
+            <div class="chart-card full-width">
+                <div class="chart-title" data-en="Skills Distribution" data-fr="Distribution des Compétences">Skills Distribution</div>
+                <div class="skills-breakdown" id="skillsBreakdown"></div>
+            </div>
+
+            <!-- Location Section -->
+            <div class="location-section">
+                <div class="location-title" data-en="🌍 Builder Locations" data-fr="🌍 Localisations des Bâtisseurs">🌍 Builder Locations</div>
+                <div class="location-grid" id="locationGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <button class="refresh-btn" onclick="loadData()">
+        <span data-en="🔄 Refresh" data-fr="🔄 Actualiser">🔄 Refresh</span>
+    </button>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZW73O34AQDahI2YEqTWdilyOirLwWQiFT5sGUjKoZNIkfEtYJIJMe6Bc_ffC2S7xCig/exec';
+        let currentLang = 'en';
+        let hoursChart, pillarChart;
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('lang-' + lang).classList.add('active');
+            
+            document.querySelectorAll('[data-en]').forEach(el => {
+                const text = el.getAttribute('data-' + lang);
+                el.textContent = text;
+            });
+        }
+
+        async function loadData() {
+            try {
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('content').style.display = 'none';
+
+                const response = await fetch(SCRIPT_URL + '?survey=builders_poll_2026');
+                const data = await response.json();
+                const responses = data.responses || [];
+
+                processData(responses);
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+
+            } catch (error) {
+                console.error('Error loading data:', error);
+                alert('Error loading data. Please check console.');
+            }
+        }
+
+        function processData(responses) {
+            document.getElementById('totalCount').textContent = responses.length;
+
+            const hourRanges = {
+                '1-5 hours': 3,
+                '5-10 hours': 7.5,
+                '10-20 hours': 15,
+                '20+ hours': 25,
+                'Support only': 0
+            };
+            let totalHours = 0;
+            responses.forEach(r => {
+                const hours = r['Q3 (Hours)'];
+                totalHours += hourRanges[hours] || 0;
+            });
+            document.getElementById('totalHours').textContent = Math.round(totalHours);
+
+            const countries = new Set();
+            responses.forEach(r => {
+                const location = r['Q4 (Location)'] || '';
+                const parts = location.split(',');
+                if (parts.length > 1) {
+                    countries.add(parts[parts.length - 1].trim());
+                }
+            });
+            document.getElementById('countryCount').textContent = countries.size;
+
+            const allSkills = new Set();
+            responses.forEach(r => {
+                const skills = r['Q2 (Skills)'] || '';
+                skills.split(';').forEach(s => {
+                    const cleaned = s.trim();
+                    if (cleaned && !cleaned.startsWith('Other:')) {
+                        allSkills.add(cleaned);
+                    }
+                });
+            });
+            document.getElementById('skillCount').textContent = allSkills.size;
+
+            createHoursChart(responses);
+            createPillarChart(responses);
+            createSkillsBreakdown(responses);
+            displayLocations(responses);
+        }
+
+        function createHoursChart(responses) {
+            const ctx = document.getElementById('hoursChart').getContext('2d');
+            if (hoursChart) hoursChart.destroy();
+
+            const hoursCounts = {};
+            responses.forEach(r => {
+                const hours = r['Q3 (Hours)'] || 'Unknown';
+                hoursCounts[hours] = (hoursCounts[hours] || 0) + 1;
+            });
+
+            hoursChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(hoursCounts),
+                    datasets: [{
+                        label: currentLang === 'en' ? 'Builders' : 'Bâtisseurs',
+                        data: Object.values(hoursCounts),
+                        backgroundColor: '#00ff6a',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: { 
+                            display: false,
+                            labels: { color: 'rgba(255,255,255,0.9)' }
+                        }
+                    },
+                    scales: {
+                        x: { 
+                            beginAtZero: true,
+                            ticks: { color: 'rgba(255,255,255,0.7)' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        },
+                        y: {
+                            ticks: { color: 'rgba(255,255,255,0.7)' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createPillarChart(responses) {
+            const ctx = document.getElementById('pillarChart').getContext('2d');
+            if (pillarChart) pillarChart.destroy();
+
+            const pillarCounts = {};
+            responses.forEach(r => {
+                const pillars = r['Q1 (Pillars)'] || '';
+                pillars.split(';').forEach(p => {
+                    const cleaned = p.trim();
+                    if (cleaned) {
+                        let short = cleaned;
+                        if (cleaned.includes('Governance')) short = currentLang === 'en' ? 'Governance' : 'Gouvernance';
+                        else if (cleaned.includes('Social')) short = 'Social';
+                        else if (cleaned.includes('International')) short = 'International';
+                        else if (cleaned.includes('Economic')) short = currentLang === 'en' ? 'Economic' : 'Économique';
+                        
+                        pillarCounts[short] = (pillarCounts[short] || 0) + 1;
+                    }
+                });
+            });
+
+            const colors = {
+                'Governance': '#00ff6a',
+                'Gouvernance': '#00ff6a',
+                'Social': '#0066cc',
+                'International': '#FCD116',
+                'Economic': '#CE1126',
+                'Économique': '#CE1126'
+            };
+
+            pillarChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(pillarCounts),
+                    datasets: [{
+                        data: Object.values(pillarCounts),
+                        backgroundColor: Object.keys(pillarCounts).map(k => colors[k] || '#999'),
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: 'rgba(255,255,255,0.9)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createSkillsBreakdown(responses) {
+            const skillCounts = {};
+            const total = responses.length;
+
+            responses.forEach(r => {
+                const skills = r['Q2 (Skills)'] || '';
+                skills.split(';').forEach(s => {
+                    const cleaned = s.trim();
+                    if (cleaned && !cleaned.startsWith('Other:')) {
+                        skillCounts[cleaned] = (skillCounts[cleaned] || 0) + 1;
+                    }
+                });
+            });
+
+            const container = document.getElementById('skillsBreakdown');
+            container.innerHTML = '';
+
+            const sortedSkills = Object.entries(skillCounts)
+                .sort((a, b) => b[1] - a[1]);
+
+            sortedSkills.forEach(([skill, count]) => {
+                const percent = total > 0 ? (count / total * 100).toFixed(1) : 0;
+                
+                let displayName = skill;
+                if (skill.length > 40) {
+                    displayName = skill.substring(0, 37) + '...';
+                }
+
+                const item = document.createElement('div');
+                item.className = 'skill-item';
+                item.innerHTML = `
+                    <div class="skill-name">${displayName}</div>
+                    <div class="skill-bar">
+                        <div class="skill-fill" style="width: ${percent}%"></div>
+                    </div>
+                    <div class="skill-count">${count} ${currentLang === 'en' ? 'builders' : 'bâtisseurs'} (${percent}%)</div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function displayLocations(responses) {
+            const locationCounts = {};
+
+            responses.forEach(r => {
+                const location = r['Q4 (Location)'] || '';
+                if (location.trim()) {
+                    locationCounts[location] = (locationCounts[location] || 0) + 1;
+                }
+            });
+
+            const container = document.getElementById('locationGrid');
+            container.innerHTML = '';
+
+            const sortedLocations = Object.entries(locationCounts)
+                .sort((a, b) => b[1] - a[1]);
+
+            sortedLocations.forEach(([location, count]) => {
+                const item = document.createElement('div');
+                item.className = 'location-item';
+                
+                let flag = '🌍';
+                if (location.toLowerCase().includes('cameroon')) flag = '🇨🇲';
+                else if (location.toLowerCase().includes('france')) flag = '🇫🇷';
+                else if (location.toLowerCase().includes('usa') || location.toLowerCase().includes('united states')) flag = '🇺🇸';
+                else if (location.toLowerCase().includes('canada')) flag = '🇨🇦';
+                else if (location.toLowerCase().includes('uk') || location.toLowerCase().includes('united kingdom')) flag = '🇬🇧';
+                
+                item.innerHTML = `<span class="location-flag">${flag}</span>${location} (${count})`;
+                container.appendChild(item);
+            });
+
+            if (sortedLocations.length === 0) {
+                container.innerHTML = `<p style="color: rgba(255,255,255,0.6); text-align: center;">${currentLang === 'en' ? 'No locations recorded yet' : 'Aucune localisation enregistrée'}</p>`;
+            }
+        }
+
+        loadData();
+    </script>
+</body>
+</html>

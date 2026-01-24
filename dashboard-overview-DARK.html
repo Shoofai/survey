@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project C - Overview Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Sora', sans-serif; 
+            background: #0a0e27;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            height: 80vh;
+            background: linear-gradient(135deg, #1a1f3a 0%, #0f1729 100%);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            overflow-y: auto;
+            border: 1px solid rgba(0,151,57,0.2);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        .lang-switcher {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            display: flex;
+            gap: 5px;
+            background: rgba(255,255,255,0.05);
+            padding: 5px;
+            border-radius: 50px;
+            border: 1px solid rgba(0,151,57,0.3);
+            z-index: 1000;
+        }
+        .lang-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 700;
+            background: transparent;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Sora', sans-serif;
+        }
+        .lang-btn.active {
+            background: #009739;
+            color: white;
+        }
+        .lang-btn:hover {
+            color: white;
+        }
+        h1 { 
+            color: #00ff6a;
+            font-size: 2.5rem; 
+            font-weight: 800; 
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(0,255,106,0.3);
+        }
+        .subtitle {
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.7);
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, rgba(0,151,57,0.1) 0%, rgba(0,151,57,0.05) 100%);
+            border-radius: 15px;
+            padding: 30px;
+            border-left: 5px solid #00ff6a;
+            border: 1px solid rgba(0,151,57,0.3);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,255,106,0.2);
+            border-color: #00ff6a;
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.6);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        .stat-value {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #00ff6a;
+            line-height: 1;
+            text-shadow: 0 0 20px rgba(0,255,106,0.3);
+        }
+        .stat-detail {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.5);
+            margin-top: 8px;
+        }
+        .dashboard-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        .dashboard-card {
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+            padding: 30px;
+            border: 2px solid rgba(0,151,57,0.2);
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .dashboard-card:hover {
+            border-color: #00ff6a;
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,255,106,0.2);
+            background: rgba(0,151,57,0.1);
+        }
+        .dashboard-card h3 {
+            color: #00ff6a;
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+        .dashboard-card p {
+            color: rgba(255,255,255,0.7);
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+        .dashboard-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #009739 0%, #00ff6a 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0,255,106,0.3);
+        }
+        .dashboard-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0,255,106,0.5);
+        }
+        .activity-section {
+            margin-top: 40px;
+        }
+        .activity-header {
+            font-size: 1.5rem;
+            color: #00ff6a;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        .activity-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+        .activity-chart {
+            background: rgba(255,255,255,0.03);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border: 1px solid rgba(0,151,57,0.2);
+        }
+        .chart-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .loading {
+            text-align: center;
+            padding: 60px;
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.7);
+        }
+        .spinner {
+            border: 5px solid rgba(255,255,255,0.1);
+            border-top: 5px solid #00ff6a;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .error-message {
+            background: rgba(206,17,38,0.2);
+            color: #ff6b6b;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid rgba(206,17,38,0.4);
+            text-align: center;
+            margin: 20px 0;
+        }
+        .refresh-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #009739 0%, #00ff6a 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0,255,106,0.4);
+            transition: all 0.3s;
+            font-family: 'Sora', sans-serif;
+        }
+        .refresh-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 30px rgba(0,255,106,0.6);
+        }
+        @media (max-width: 1024px) {
+            .activity-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .stat-value {
+                font-size: 2.5rem;
+            }
+            .lang-switcher {
+                top: 15px;
+                right: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="lang-switcher">
+        <button class="lang-btn active" onclick="switchLanguage('en')" id="lang-en">EN</button>
+        <button class="lang-btn" onclick="switchLanguage('fr')" id="lang-fr">FR</button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1 data-en="🌍 Project C Dashboard" data-fr="🌍 Tableau de Bord Projet C">🌍 Project C Dashboard</h1>
+            <p class="subtitle" data-en="Overview & Analytics" data-fr="Vue d'Ensemble & Analyses">Overview & Analytics</p>
+        </div>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p data-en="Loading dashboard data..." data-fr="Chargement des données...">Loading dashboard data...</p>
+        </div>
+
+        <div id="content" style="display: none;">
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label" data-en="Total Responses" data-fr="Réponses Totales">Total Responses</div>
+                    <div class="stat-value" id="totalResponses">0</div>
+                    <div class="stat-detail" data-en="Across both polls" data-fr="Sur les deux sondages">Across both polls</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label" data-en="Priority Assessments" data-fr="Évaluations Prioritaires">Priority Assessments</div>
+                    <div class="stat-value" id="priorityCount">0</div>
+                    <div class="stat-detail" data-en="Voices heard" data-fr="Voix entendues">Voices heard</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label" data-en="Builder Commitments" data-fr="Engagements Bâtisseurs">Builder Commitments</div>
+                    <div class="stat-value" id="builderCount">0</div>
+                    <div class="stat-detail" data-en="Active builders" data-fr="Bâtisseurs actifs">Active builders</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label" data-en="Average Confidence" data-fr="Confiance Moyenne">Average Confidence</div>
+                    <div class="stat-value" id="avgConfidence">0</div>
+                    <div class="stat-detail" data-en="Out of 10" data-fr="Sur 10">Out of 10</div>
+                </div>
+            </div>
+
+            <!-- Dashboard Links -->
+            <div class="dashboard-links">
+                <div class="dashboard-card" onclick="window.location.href='dashboard-priority-DARK.html'">
+                    <h3>🌍 <span data-en="Priority Poll" data-fr="Sondage Priorités">Priority Poll</span></h3>
+                    <p data-en="View detailed priority assessment results" data-fr="Voir les résultats d'évaluation détaillés">View detailed priority assessment results</p>
+                    <a href="dashboard-priority-DARK.html" class="dashboard-btn" data-en="View Dashboard →" data-fr="Voir Tableau de Bord →">View Dashboard →</a>
+                </div>
+                <div class="dashboard-card" onclick="window.location.href='dashboard-builders-DARK.html'">
+                    <h3>💪 <span data-en="Builder Poll" data-fr="Sondage Bâtisseurs">Builder Poll</span></h3>
+                    <p data-en="View builder commitments and skills" data-fr="Voir les engagements et compétences">View builder commitments and skills</p>
+                    <a href="dashboard-builders-DARK.html" class="dashboard-btn" data-en="View Dashboard →" data-fr="Voir Tableau de Bord →">View Dashboard →</a>
+                </div>
+            </div>
+
+            <!-- Activity Charts -->
+            <div class="activity-section">
+                <div class="activity-header" data-en="📊 Response Activity" data-fr="📊 Activité des Réponses">📊 Response Activity</div>
+                <div class="activity-grid">
+                    <div class="activity-chart">
+                        <div class="chart-title" data-en="Responses Over Time" data-fr="Réponses au Fil du Temps">Responses Over Time</div>
+                        <canvas id="timelineChart"></canvas>
+                    </div>
+                    <div class="activity-chart">
+                        <div class="chart-title" data-en="Language Distribution" data-fr="Distribution Linguistique">Language Distribution</div>
+                        <canvas id="languageChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="error" style="display: none;" class="error-message">
+            <h3 data-en="⚠️ Unable to Load Data" data-fr="⚠️ Impossible de Charger les Données">⚠️ Unable to Load Data</h3>
+            <p data-en="Please check your Apps Script configuration and try again." data-fr="Veuillez vérifier votre configuration Apps Script.">Please check your Apps Script configuration and try again.</p>
+        </div>
+    </div>
+
+    <button class="refresh-btn" onclick="loadData()">
+        <span data-en="🔄 Refresh" data-fr="🔄 Actualiser">🔄 Refresh</span>
+    </button>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZW73O34AQDahI2YEqTWdilyOirLwWQiFT5sGUjKoZNIkfEtYJIJMe6Bc_ffC2S7xCig/exec';
+        let currentLang = 'en';
+        let timelineChart, languageChart;
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('lang-' + lang).classList.add('active');
+            
+            document.querySelectorAll('[data-en]').forEach(el => {
+                const text = el.getAttribute('data-' + lang);
+                if (el.tagName === 'SPAN' || el.tagName === 'P' || el.tagName === 'A') {
+                    el.textContent = text;
+                } else {
+                    el.textContent = text;
+                }
+            });
+        }
+
+        async function loadData() {
+            try {
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('content').style.display = 'none';
+                document.getElementById('error').style.display = 'none';
+
+                const [priorityRes, builderRes] = await Promise.all([
+                    fetch(SCRIPT_URL + '?survey=priority_poll_2026'),
+                    fetch(SCRIPT_URL + '?survey=builders_poll_2026')
+                ]);
+
+                const priorityData = await priorityRes.json();
+                const builderData = await builderRes.json();
+
+                processData(priorityData.responses || [], builderData.responses || []);
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+            }
+        }
+
+        function processData(priorityResponses, builderResponses) {
+            document.getElementById('totalResponses').textContent = 
+                priorityResponses.length + builderResponses.length;
+            document.getElementById('priorityCount').textContent = priorityResponses.length;
+            document.getElementById('builderCount').textContent = builderResponses.length;
+
+            if (priorityResponses.length > 0) {
+                const avgConf = priorityResponses.reduce((sum, r) => 
+                    sum + parseInt(r['Q1 (Confidence)'] || 0), 0) / priorityResponses.length;
+                document.getElementById('avgConfidence').textContent = avgConf.toFixed(1);
+            }
+
+            createTimelineChart(priorityResponses, builderResponses);
+            createLanguageChart(priorityResponses, builderResponses);
+        }
+
+        function createTimelineChart(priority, builder) {
+            const ctx = document.getElementById('timelineChart').getContext('2d');
+            if (timelineChart) timelineChart.destroy();
+
+            const dateGroups = {};
+            [...priority, ...builder].forEach(r => {
+                const date = new Date(r.Timestamp).toLocaleDateString();
+                dateGroups[date] = (dateGroups[date] || 0) + 1;
+            });
+
+            const dates = Object.keys(dateGroups).sort();
+            const counts = dates.map(d => dateGroups[d]);
+
+            timelineChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: currentLang === 'en' ? 'Responses' : 'Réponses',
+                        data: counts,
+                        borderColor: '#00ff6a',
+                        backgroundColor: 'rgba(0, 255, 106, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { 
+                            display: false,
+                            labels: { color: 'rgba(255,255,255,0.9)' }
+                        }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            ticks: { color: 'rgba(255,255,255,0.7)' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        },
+                        x: {
+                            ticks: { color: 'rgba(255,255,255,0.7)' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createLanguageChart(priority, builder) {
+            const ctx = document.getElementById('languageChart').getContext('2d');
+            if (languageChart) languageChart.destroy();
+
+            const langCount = { en: 0, fr: 0 };
+            [...priority, ...builder].forEach(r => {
+                const lang = r.Language || 'en';
+                langCount[lang] = (langCount[lang] || 0) + 1;
+            });
+
+            languageChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['English', 'Français'],
+                    datasets: [{
+                        data: [langCount.en, langCount.fr],
+                        backgroundColor: ['#00ff6a', '#FCD116'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: 'rgba(255,255,255,0.9)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        loadData();
+    </script>
+</body>
+</html>
