@@ -7,248 +7,37 @@
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Sora', sans-serif;
-            background: #0a0e27;
-            color: #ffffff;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .language-switcher {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 5px;
-            background: rgba(255,255,255,0.1);
-            padding: 5px;
-            border-radius: 50px;
-            backdrop-filter: blur(10px);
-            z-index: 999;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-
-        .lang-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            font-weight: 700;
-            background: transparent;
-            color: rgba(255,255,255,0.7);
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Sora', sans-serif;
-        }
-
-        .lang-btn:hover {
-            background: rgba(255,255,255,0.1);
-            color: white;
-        }
-
-        .lang-btn.active {
-            background: linear-gradient(135deg, #009739 0%, #00b547 100%);
-            color: white;
-            box-shadow: 0 2px 8px rgba(0,151,57,0.3);
-        }
-
-        .container {
-            max-width: 1600px;
-            margin: 0 auto;
-        }
-
-        .header {
-            text-align: center;
-            padding: 40px 20px;
-            background: linear-gradient(135deg, rgba(0,151,57,0.2) 0%, rgba(252,209,22,0.2) 100%);
-            border-radius: 20px;
-            margin-bottom: 40px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #009739 0%, #FCD116 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .header .subtitle {
-            color: rgba(255,255,255,0.7);
-            font-size: 1.1rem;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
-        }
-
-        .stat-card {
-            background: linear-gradient(135deg, #1a1f3a 0%, #2a2f4a 100%);
-            padding: 35px;
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.1);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #009739 0%, #FCD116 100%);
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 40px rgba(0,151,57,0.3);
-        }
-
-        .stat-icon {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-        }
-
-        .stat-value {
-            font-size: 3rem;
-            font-weight: 800;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, #009739 0%, #FCD116 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .stat-label {
-            color: rgba(255,255,255,0.7);
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .charts-section {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        .chart-card {
-            background: linear-gradient(135deg, #1a1f3a 0%, #2a2f4a 100%);
-            padding: 30px;
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .chart-card h2 {
-            margin-bottom: 25px;
-            font-size: 1.3rem;
-            color: rgba(255,255,255,0.9);
-        }
-
-        .chart-container {
-            position: relative;
-            height: 350px;
-        }
-
-        .other-responses {
-            background: linear-gradient(135deg, #1a1f3a 0%, #2a2f4a 100%);
-            padding: 30px;
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.1);
-            margin-bottom: 40px;
-        }
-
-        .other-responses h2 {
-            margin-bottom: 20px;
-            font-size: 1.3rem;
-        }
-
-        .other-item {
-            background: rgba(255,255,255,0.05);
-            padding: 15px 20px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            border-left: 3px solid #FCD116;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 60px 20px;
-        }
-
-        .spinner {
-            border: 4px solid rgba(255,255,255,0.1);
-            border-top: 4px solid #009739;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .refresh-btn {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: linear-gradient(135deg, #009739 0%, #00b547 100%);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 50px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 8px 25px rgba(0,151,57,0.4);
-            transition: all 0.3s ease;
-            font-family: 'Sora', sans-serif;
-            font-size: 1rem;
-        }
-
-        .refresh-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 35px rgba(0,151,57,0.5);
-        }
-
-        .last-updated {
-            text-align: center;
-            color: rgba(255,255,255,0.5);
-            font-size: 0.85rem;
-            margin-top: 30px;
-        }
-
-        @media (max-width: 768px) {
-            .charts-section {
-                grid-template-columns: 1fr;
-            }
-
-            .header h1 {
-                font-size: 2rem;
-            }
-
-            .stat-value {
-                font-size: 2.5rem;
-            }
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Sora', sans-serif; background: #0a0e27; color: #ffffff; min-height: 100vh; padding: 20px; }
+        .language-switcher { position: fixed; top: 20px; right: 20px; display: flex; gap: 5px; background: rgba(255,255,255,0.1); padding: 5px; border-radius: 50px; backdrop-filter: blur(10px); z-index: 999; border: 1px solid rgba(255,255,255,0.2); }
+        .lang-btn { padding: 10px 20px; border: none; border-radius: 50px; font-size: 0.9rem; font-weight: 700; background: transparent; color: rgba(255,255,255,0.7); cursor: pointer; transition: all 0.3s; font-family: 'Sora', sans-serif; }
+        .lang-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+        .lang-btn.active { background: linear-gradient(135deg, #009739 0%, #00b547 100%); color: white; box-shadow: 0 2px 8px rgba(0,151,57,0.3); }
+        .container { max-width: 1600px; margin: 0 auto; }
+        .header { text-align: center; padding: 40px 20px; background: linear-gradient(135deg, rgba(0,151,57,0.2) 0%, rgba(252,209,22,0.2) 100%); border-radius: 20px; margin-bottom: 40px; border: 1px solid rgba(255,255,255,0.1); }
+        .header h1 { font-size: 2.5rem; margin-bottom: 10px; background: linear-gradient(135deg, #009739 0%, #FCD116 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .header .subtitle { color: rgba(255,255,255,0.7); font-size: 1.1rem; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin-bottom: 40px; }
+        .stat-card { background: linear-gradient(135deg, #1a1f3a 0%, #2a2f4a 100%); padding: 35px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease; position: relative; overflow: hidden; }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #009739 0%, #FCD116 100%); }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 40px rgba(0,151,57,0.3); }
+        .stat-icon { font-size: 2.5rem; margin-bottom: 15px; }
+        .stat-value { font-size: 3rem; font-weight: 800; margin-bottom: 8px; background: linear-gradient(135deg, #009739 0%, #FCD116 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .stat-label { color: rgba(255,255,255,0.7); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+        .charts-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 30px; margin-bottom: 40px; }
+        .chart-card { background: linear-gradient(135deg, #1a1f3a 0%, #2a2f4a 100%); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); }
+        .chart-card h2 { margin-bottom: 25px; font-size: 1.3rem; color: rgba(255,255,255,0.9); }
+        .chart-container { position: relative; height: 350px; }
+        .other-responses { background: linear-gradient(135deg, #1a1f3a 0%, #2a2f4a 100%); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 40px; }
+        .other-responses h2 { margin-bottom: 20px; font-size: 1.3rem; }
+        .other-item { background: rgba(255,255,255,0.05); padding: 15px 20px; border-radius: 10px; margin-bottom: 10px; border-left: 3px solid #FCD116; }
+        .loading { text-align: center; padding: 60px 20px; }
+        .spinner { border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid #009739; border-radius: 50%; width: 60px; height: 60px; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .refresh-btn { position: fixed; bottom: 30px; right: 30px; background: linear-gradient(135deg, #009739 0%, #00b547 100%); color: white; border: none; padding: 15px 30px; border-radius: 50px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 25px rgba(0,151,57,0.4); transition: all 0.3s ease; font-family: 'Sora', sans-serif; font-size: 1rem; }
+        .refresh-btn:hover { transform: translateY(-3px); box-shadow: 0 12px 35px rgba(0,151,57,0.5); }
+        .last-updated { text-align: center; color: rgba(255,255,255,0.5); font-size: 0.85rem; margin-top: 30px; }
+        @media (max-width: 768px) { .charts-section { grid-template-columns: 1fr; } .header h1 { font-size: 2rem; } .stat-value { font-size: 2.5rem; } }
     </style>
 </head>
 <body>
@@ -256,18 +45,15 @@
         <button class="lang-btn active" onclick="switchLanguage('en')" id="lang-en">EN</button>
         <button class="lang-btn" onclick="switchLanguage('fr')" id="lang-fr">FR</button>
     </div>
-
     <div class="container">
         <div class="header">
             <h1 data-en="🌍 Diaspora Poll Analytics" data-fr="🌍 Analyse du Sondage Diaspora">🌍 Diaspora Poll Analytics</h1>
             <p class="subtitle" data-en="Real-Time Engagement Dashboard • Project C" data-fr="Tableau de Bord d'Engagement en Temps Réel • Projet C">Real-Time Engagement Dashboard • Project C</p>
         </div>
-
         <div id="loading" class="loading">
             <div class="spinner"></div>
             <p data-en="Loading dashboard data..." data-fr="Chargement des données...">Loading dashboard data...</p>
         </div>
-
         <div id="dashboard" style="display: none;">
             <div class="stats-grid">
                 <div class="stat-card">
@@ -275,229 +61,146 @@
                     <div class="stat-value" id="totalResponses">0</div>
                     <div class="stat-label" data-en="Total Responses" data-fr="Total Réponses">Total Responses</div>
                 </div>
-
                 <div class="stat-card">
                     <div class="stat-icon">⭐</div>
                     <div class="stat-value" id="avgConfidence">0</div>
                     <div class="stat-label" data-en="Average Confidence" data-fr="Confiance Moyenne">Average Confidence</div>
                 </div>
-
                 <div class="stat-card">
                     <div class="stat-icon">🎯</div>
                     <div class="stat-value" id="topPillar">-</div>
                     <div class="stat-label" data-en="Top Priority Pillar" data-fr="Pilier Prioritaire">Top Priority Pillar</div>
                 </div>
-
                 <div class="stat-card">
                     <div class="stat-icon">💪</div>
                     <div class="stat-value" id="activeCommitments">0%</div>
                     <div class="stat-label" data-en="Active Commitments" data-fr="Engagements Actifs">Active Commitments</div>
                 </div>
             </div>
-
             <div class="charts-section">
                 <div class="chart-card">
                     <h2 data-en="📊 Pillar Priority Distribution" data-fr="📊 Distribution des Priorités">📊 Pillar Priority Distribution</h2>
-                    <div class="chart-container">
-                        <canvas id="pillarChart"></canvas>
-                    </div>
+                    <div class="chart-container"><canvas id="pillarChart"></canvas></div>
                 </div>
-
                 <div class="chart-card">
                     <h2 data-en="📈 Commitment Breakdown" data-fr="📈 Répartition des Engagements">📈 Commitment Breakdown</h2>
-                    <div class="chart-container">
-                        <canvas id="commitmentChart"></canvas>
-                    </div>
+                    <div class="chart-container"><canvas id="commitmentChart"></canvas></div>
                 </div>
-
                 <div class="chart-card">
                     <h2 data-en="🎯 Confidence Score Distribution" data-fr="🎯 Distribution des Scores de Confiance">🎯 Confidence Score Distribution</h2>
-                    <div class="chart-container">
-                        <canvas id="confidenceChart"></canvas>
-                    </div>
+                    <div class="chart-container"><canvas id="confidenceChart"></canvas></div>
                 </div>
             </div>
-
             <div class="other-responses" id="otherResponses" style="display: none;">
                 <h2 data-en="✍️ Other Pillar Suggestions" data-fr="✍️ Autres Suggestions de Piliers">✍️ Other Pillar Suggestions</h2>
                 <div id="otherList"></div>
             </div>
-
             <div class="last-updated">
                 <span data-en="Last updated:" data-fr="Dernière mise à jour :">Last updated:</span> <span id="lastUpdated"></span> • 
                 <span data-en="Auto-refreshes every 30 seconds" data-fr="Actualisation automatique toutes les 30 secondes">Auto-refreshes every 30 seconds</span>
             </div>
         </div>
-
         <button class="refresh-btn" onclick="loadResults()">
             <span data-en="🔄 Refresh Now" data-fr="🔄 Actualiser">🔄 Refresh Now</span>
         </button>
     </div>
-
     <script>
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZW73O34AQDahI2YEqTWdilyOirLwWQiFT5sGUjKoZNIkfEtYJIJMe6Bc_ffC2S7xCig/exec?survey=diaspora_poll_2026';
-        
         let currentLang = 'en';
         let pillarChart, commitmentChart, confidenceChart;
-
-        const translations = {
-            en: {
-                responses: 'Responses',
-                question1: 'Question 1',
-                question2: 'Question 2',
-                question3: 'Question 3',
-                q1Label: 'Q1: Shared Objective',
-                q2Label: 'Q2: Coordination',
-                q3Label: 'Q3: Framework'
-            },
-            fr: {
-                responses: 'Réponses',
-                question1: 'Question 1',
-                question2: 'Question 2',
-                question3: 'Question 3',
-                q1Label: 'Q1: Objectif Partagé',
-                q2Label: 'Q2: Coordination',
-                q3Label: 'Q3: Cadre'
-            }
+        let cachedData = null;
+        
+        const labelTranslations = {
+            'Governance & Democratic Institutions': { en: 'Governance & Democratic Institutions', fr: 'Gouvernance & Institutions Démocratiques' },
+            'Social Cohesion & Unity': { en: 'Social Cohesion & Unity', fr: 'Cohésion Sociale & Unité' },
+            'International Advocacy & Pressure': { en: 'International Advocacy & Pressure', fr: 'Plaidoyer & Pression Internationale' },
+            'Economic Reconstruction & Support': { en: 'Economic Reconstruction & Support', fr: 'Reconstruction & Soutien Économique' },
+            'Security & Protection': { en: 'Security & Protection', fr: 'Sécurité & Protection' },
+            'Monthly financial support': { en: 'Monthly financial support', fr: 'Soutien financier mensuel' },
+            'Active advocacy': { en: 'Active advocacy', fr: 'Plaidoyer actif' },
+            'Diplomatic pressure': { en: 'Diplomatic pressure', fr: 'Pression diplomatique' },
+            'Local organizing': { en: 'Local organizing', fr: 'Organisation locale' },
+            'Asylum/protection support': { en: 'Asylum/protection support', fr: 'Soutien asile/protection' },
+            'Professional skills': { en: 'Professional skills', fr: 'Compétences professionnelles' },
+            'Documentation & evidence': { en: 'Documentation & evidence', fr: 'Documentation & preuves' },
+            'Network building': { en: 'Network building', fr: 'Construction de réseau' },
+            'Moral support only': { en: 'Moral support only', fr: 'Soutien moral seulement' }
         };
-
+        
+        const translations = { en: { responses: 'Responses' }, fr: { responses: 'Réponses' } };
+        
+        function translateLabel(text) {
+            return labelTranslations[text] ? labelTranslations[text][currentLang] : text;
+        }
+        
         function switchLanguage(lang) {
             currentLang = lang;
             document.documentElement.lang = lang;
-
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById('lang-' + lang).classList.add('active');
-
             document.querySelectorAll('[data-en]').forEach(element => {
-                const text = element.getAttribute('data-' + lang);
-                element.textContent = text;
+                element.textContent = element.getAttribute('data-' + lang);
             });
-
-            if (pillarChart && commitmentChart && confidenceChart) {
-                updateChartLabels();
-            }
+            if (cachedData) displayResults(cachedData);
         }
-
-        function updateChartLabels() {
-            const t = translations[currentLang];
-            
-            // Update commitment chart
-            if (commitmentChart) {
-                commitmentChart.data.datasets[0].label = t.responses;
-                commitmentChart.update();
-            }
-
-            // Update confidence chart
-            if (confidenceChart) {
-                confidenceChart.data.datasets[0].label = t.responses;
-                confidenceChart.update();
-            }
-        }
-
+        
         async function loadResults() {
             try {
                 const response = await fetch(SCRIPT_URL);
                 const result = await response.json();
-
                 if (result.success) {
+                    cachedData = result.data;
                     displayResults(result.data);
                     document.getElementById('loading').style.display = 'none';
                     document.getElementById('dashboard').style.display = 'block';
                 }
             } catch (error) {
-                console.error('Error loading results:', error);
-                const errorMsg = currentLang === 'en' 
-                    ? 'Error loading dashboard. Please refresh.'
-                    : 'Erreur de chargement. Veuillez actualiser.';
-                document.getElementById('loading').innerHTML = `<p style="color: #ff6b6b;">${errorMsg}</p>`;
+                const errorMsg = currentLang === 'en' ? 'Error loading dashboard. Please refresh.' : 'Erreur de chargement. Veuillez actualiser.';
+                document.getElementById('loading').innerHTML = '<p style="color: #ff6b6b;">' + errorMsg + '</p>';
             }
         }
-
+        
         function displayResults(data) {
             const totalResponses = data.responses.length;
-            const avgConfidence = totalResponses > 0 
-                ? (data.responses.reduce((sum, r) => sum + parseInt(r.q1), 0) / totalResponses).toFixed(1)
-                : 0;
-
-            // Count pillars
+            const avgConfidence = totalResponses > 0 ? (data.responses.reduce((sum, r) => sum + parseInt(r.q1), 0) / totalResponses).toFixed(1) : 0;
             const pillarCounts = {};
-            data.responses.forEach(r => {
-                const pillar = r.q2;
-                pillarCounts[pillar] = (pillarCounts[pillar] || 0) + 1;
-            });
-
-            const topPillar = Object.keys(pillarCounts).reduce((a, b) => 
-                pillarCounts[a] > pillarCounts[b] ? a : b, Object.keys(pillarCounts)[0] || '-'
-            );
-
-            // Count commitments
+            data.responses.forEach(r => { pillarCounts[r.q2] = (pillarCounts[r.q2] || 0) + 1; });
+            const topPillar = Object.keys(pillarCounts).reduce((a, b) => pillarCounts[a] > pillarCounts[b] ? a : b, Object.keys(pillarCounts)[0] || '-');
             let activeCount = 0;
             data.responses.forEach(r => {
                 const commitments = r.q3.split(';').map(c => c.trim()).filter(c => c);
-                if (commitments.length > 0 && !commitments.includes('Moral support only')) {
-                    activeCount++;
-                }
+                if (commitments.length > 0 && !commitments.includes('Moral support only')) activeCount++;
             });
             const activePercent = totalResponses > 0 ? Math.round((activeCount / totalResponses) * 100) : 0;
-
-            // Update stat cards
             document.getElementById('totalResponses').textContent = totalResponses;
             document.getElementById('avgConfidence').textContent = avgConfidence + '/10';
-            document.getElementById('topPillar').textContent = topPillar.substring(0, 20) + (topPillar.length > 20 ? '...' : '');
+            const translatedTopPillar = translateLabel(topPillar);
+            document.getElementById('topPillar').textContent = translatedTopPillar.substring(0, 20) + (translatedTopPillar.length > 20 ? '...' : '');
             document.getElementById('activeCommitments').textContent = activePercent + '%';
-
-            // Update charts
             updatePillarChart(pillarCounts);
             updateCommitmentChart(data.responses);
             updateConfidenceChart(data.responses);
-
-            // Update other responses
             const otherResponses = data.responses.filter(r => r.q2.startsWith('Other:'));
             if (otherResponses.length > 0) {
                 document.getElementById('otherResponses').style.display = 'block';
-                const otherList = document.getElementById('otherList');
-                otherList.innerHTML = otherResponses.map(r => 
-                    `<div class="other-item">${r.q2.replace('Other: ', '')}</div>`
-                ).join('');
+                document.getElementById('otherList').innerHTML = otherResponses.map(r => '<div class="other-item">' + r.q2.replace('Other: ', '') + '</div>').join('');
             }
-
             document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
         }
-
+        
         function updatePillarChart(pillarCounts) {
             const ctx = document.getElementById('pillarChart');
-
-            if (pillarChart) {
-                pillarChart.destroy();
-            }
-
-            const labels = Object.keys(pillarCounts);
+            if (pillarChart) pillarChart.destroy();
+            const labels = Object.keys(pillarCounts).map(label => translateLabel(label));
             const data = Object.values(pillarCounts);
-
             pillarChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: labels,
                     datasets: [{
                         data: data,
-                        backgroundColor: [
-                            'rgba(0, 151, 57, 0.8)',
-                            'rgba(252, 209, 22, 0.8)',
-                            'rgba(0, 181, 71, 0.8)',
-                            'rgba(206, 17, 38, 0.8)',
-                            'rgba(100, 200, 150, 0.8)',
-                            'rgba(150, 150, 200, 0.8)'
-                        ],
-                        borderColor: [
-                            'rgba(0, 151, 57, 1)',
-                            'rgba(252, 209, 22, 1)',
-                            'rgba(0, 181, 71, 1)',
-                            'rgba(206, 17, 38, 1)',
-                            'rgba(100, 200, 150, 1)',
-                            'rgba(150, 150, 200, 1)'
-                        ],
+                        backgroundColor: ['rgba(0, 151, 57, 0.8)', 'rgba(252, 209, 22, 0.8)', 'rgba(0, 181, 71, 0.8)', 'rgba(206, 17, 38, 0.8)', 'rgba(100, 200, 150, 0.8)', 'rgba(150, 150, 200, 0.8)'],
+                        borderColor: ['rgba(0, 151, 57, 1)', 'rgba(252, 209, 22, 1)', 'rgba(0, 181, 71, 1)', 'rgba(206, 17, 38, 1)', 'rgba(100, 200, 150, 1)', 'rgba(150, 150, 200, 1)'],
                         borderWidth: 2
                     }]
                 },
@@ -507,38 +210,24 @@
                     plugins: {
                         legend: {
                             position: 'bottom',
-                            labels: {
-                                color: 'rgba(255, 255, 255, 0.8)',
-                                font: { size: 11 },
-                                padding: 15
-                            }
+                            labels: { color: 'rgba(255, 255, 255, 0.8)', font: { size: 11 }, padding: 15 }
                         }
                     }
                 }
             });
         }
-
+        
         function updateCommitmentChart(responses) {
             const ctx = document.getElementById('commitmentChart');
-
-            if (commitmentChart) {
-                commitmentChart.destroy();
-            }
-
+            if (commitmentChart) commitmentChart.destroy();
             const t = translations[currentLang];
-
-            // Count all commitments
             const commitmentCounts = {};
             responses.forEach(r => {
                 const commitments = r.q3.split(';').map(c => c.trim()).filter(c => c);
-                commitments.forEach(c => {
-                    commitmentCounts[c] = (commitmentCounts[c] || 0) + 1;
-                });
+                commitments.forEach(c => { commitmentCounts[c] = (commitmentCounts[c] || 0) + 1; });
             });
-
-            const labels = Object.keys(commitmentCounts);
+            const labels = Object.keys(commitmentCounts).map(label => translateLabel(label));
             const data = Object.values(commitmentCounts);
-
             commitmentChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -555,57 +244,24 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     indexAxis: 'y',
-                    plugins: {
-                        legend: { display: false }
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
-                        x: {
-                            beginAtZero: true,
-                            ticks: {
-                                color: 'rgba(255, 255, 255, 0.6)',
-                                stepSize: 1
-                            },
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
-                            }
-                        },
-                        y: {
-                            ticks: {
-                                color: 'rgba(255, 255, 255, 0.6)',
-                                font: { size: 10 }
-                            },
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
-                            }
-                        }
+                        x: { beginAtZero: true, ticks: { color: 'rgba(255, 255, 255, 0.6)', stepSize: 1 }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
+                        y: { ticks: { color: 'rgba(255, 255, 255, 0.6)', font: { size: 10 } }, grid: { color: 'rgba(255, 255, 255, 0.1)' } }
                     }
                 }
             });
         }
-
+        
         function updateConfidenceChart(responses) {
             const ctx = document.getElementById('confidenceChart');
-
-            if (confidenceChart) {
-                confidenceChart.destroy();
-            }
-
+            if (confidenceChart) confidenceChart.destroy();
             const t = translations[currentLang];
-
-            // Count confidence scores
             const confidenceCounts = {};
-            for (let i = 1; i <= 10; i++) {
-                confidenceCounts[i] = 0;
-            }
-
-            responses.forEach(r => {
-                const score = parseInt(r.q1);
-                confidenceCounts[score] = (confidenceCounts[score] || 0) + 1;
-            });
-
+            for (let i = 1; i <= 10; i++) confidenceCounts[i] = 0;
+            responses.forEach(r => { confidenceCounts[parseInt(r.q1)] = (confidenceCounts[parseInt(r.q1)] || 0) + 1; });
             const labels = Object.keys(confidenceCounts);
             const data = Object.values(confidenceCounts);
-
             confidenceChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -621,33 +277,15 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                color: 'rgba(255, 255, 255, 0.6)',
-                                stepSize: 1
-                            },
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
-                            }
-                        },
-                        x: {
-                            ticks: {
-                                color: 'rgba(255, 255, 255, 0.6)'
-                            },
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.1)'
-                            }
-                        }
+                        y: { beginAtZero: true, ticks: { color: 'rgba(255, 255, 255, 0.6)', stepSize: 1 }, grid: { color: 'rgba(255, 255, 255, 0.1)' } },
+                        x: { ticks: { color: 'rgba(255, 255, 255, 0.6)' }, grid: { color: 'rgba(255, 255, 255, 0.1)' } }
                     }
                 }
             });
         }
-
+        
         loadResults();
         setInterval(loadResults, 30000);
     </script>
