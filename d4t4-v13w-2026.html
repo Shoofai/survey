@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            background: #0a0e27;
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .language-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 5px;
+            background: rgba(255,255,255,0.1);
+            padding: 5px;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+            z-index: 999;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .lang-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            background: transparent;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Sora', sans-serif;
+        }
+
+        .lang-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .lang-btn.active {
+            background: linear-gradient(135deg, #009739 0%, #00b547 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(0,151,57,0.3);
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, rgba(0,151,57,0.2) 0%, rgba(252,209,22,0.2) 100%);
+            border-radius: 20px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #009739 0%, #FCD116 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header .subtitle {
+            color: rgba(255,255,255,0.7);
+            font-size: 1.1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #1a1f3a 0%, #2a2f4a 100%);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #009739 0%, #FCD116 100%);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0,151,57,0.5);
+            box-shadow: 0 10px 40px rgba(0,151,57,0.3);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .stat-value {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #009739 0%, #FCD116 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .stat-label {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .chart-card {
+            background: linear-gradient(135deg, #1a1f3a 0%, #2a2f4a 100%);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .chart-card h2 {
+            margin-bottom: 25px;
+            font-size: 1.3rem;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .voters-section {
+            background: linear-gradient(135deg, #1a1f3a 0%, #2a2f4a 100%);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 40px;
+        }
+
+        .voters-section h2 {
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        thead {
+            background: rgba(0,151,57,0.2);
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,0.9);
+            border-bottom: 2px solid rgba(0,151,57,0.5);
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.8);
+        }
+
+        tr:hover {
+            background: rgba(0,151,57,0.1);
+        }
+
+        .vote-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .vote-yes {
+            background: rgba(0,151,57,0.3);
+            color: #00ff7f;
+            border: 1px solid rgba(0,151,57,0.5);
+        }
+
+        .vote-no {
+            background: rgba(206,17,38,0.3);
+            color: #ff6b6b;
+            border: 1px solid rgba(206,17,38,0.5);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top: 4px solid #009739;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .refresh-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #009739 0%, #00b547 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(0,151,57,0.4);
+            transition: all 0.3s ease;
+            font-family: 'Sora', sans-serif;
+            font-size: 1rem;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0,151,57,0.5);
+        }
+
+        .last-updated {
+            text-align: center;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.85rem;
+            margin-top: 30px;
+        }
+
+        .consensus-indicator {
+            background: linear-gradient(135deg, #1a1f3a 0%, #2a2f4a 100%);
+            padding: 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .consensus-indicator h2 {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .consensus-bar {
+            background: rgba(255,255,255,0.1);
+            height: 40px;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .consensus-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #009739 0%, #00ff7f 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .consensus-text {
+            margin-top: 15px;
+            font-size: 1.1rem;
+            color: rgba(255,255,255,0.8);
+        }
+
+        @media (max-width: 768px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .stat-value {
+                font-size: 2.5rem;
+            }
+
+            .refresh-btn {
+                bottom: 20px;
+                right: 20px;
+                padding: 12px 24px;
+                font-size: 0.9rem;
+            }
+
+            table {
+                font-size: 0.85rem;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+
+            .language-switcher {
+                top: 10px;
+                right: 10px;
+            }
+
+            .lang-btn {
+                padding: 8px 15px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="language-switcher">
+        <button class="lang-btn active" onclick="switchLanguage('en')" id="lang-en">EN</button>
+        <button class="lang-btn" onclick="switchLanguage('fr')" id="lang-fr">FR</button>
+    </div>
+
+    <div class="dashboard-container">
+        <div class="header">
+            <h1 data-en="📊 Strategic Framework Vote Analytics" data-fr="📊 Analyse du Vote du Cadre Stratégique">📊 Strategic Framework Vote Analytics</h1>
+            <p class="subtitle" data-en="Real-Time Decision Dashboard • Project C" data-fr="Tableau de Bord de Décision en Temps Réel • Projet C">Real-Time Decision Dashboard • Project C</p>
+        </div>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p data-en="Loading dashboard data..." data-fr="Chargement des données du tableau de bord...">Loading dashboard data...</p>
+        </div>
+
+        <div id="dashboard" style="display: none;">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">🗳️</div>
+                    <div class="stat-value" id="totalVotes">0</div>
+                    <div class="stat-label" data-en="Total Votes Cast" data-fr="Total des Votes Exprimés">Total Votes Cast</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">✓</div>
+                    <div class="stat-value" id="q1Percent">0%</div>
+                    <div class="stat-label" data-en="Q1: Yes Votes" data-fr="Q1: Votes Oui">Q1: Yes Votes</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">✓</div>
+                    <div class="stat-value" id="q2Percent">0%</div>
+                    <div class="stat-label" data-en="Q2: Yes Votes" data-fr="Q2: Votes Oui">Q2: Yes Votes</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">✓</div>
+                    <div class="stat-value" id="q3Percent">0%</div>
+                    <div class="stat-label" data-en="Q3: Yes Votes" data-fr="Q3: Votes Oui">Q3: Yes Votes</div>
+                </div>
+            </div>
+
+            <div class="consensus-indicator">
+                <h2 data-en="Overall Consensus Level" data-fr="Niveau de Consensus Global">Overall Consensus Level</h2>
+                <div class="consensus-bar">
+                    <div class="consensus-fill" id="consensusFill">0%</div>
+                </div>
+                <p class="consensus-text" id="consensusText" data-en="Calculating consensus..." data-fr="Calcul du consensus...">Calculating consensus...</p>
+            </div>
+
+            <div class="charts-section">
+                <div class="chart-card">
+                    <h2 data-en="📊 Vote Distribution by Question" data-fr="📊 Distribution des Votes par Question">📊 Vote Distribution by Question</h2>
+                    <div class="chart-container">
+                        <canvas id="votesChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <h2 data-en="📈 Consensus Breakdown" data-fr="📈 Répartition du Consensus">📈 Consensus Breakdown</h2>
+                    <div class="chart-container">
+                        <canvas id="consensusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="voters-section">
+                <h2 data-en="📋 Voter Registry & Detailed Responses" data-fr="📋 Registre des Votants & Réponses Détaillées">📋 Voter Registry & Detailed Responses</h2>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th data-en="Name" data-fr="Nom">Name</th>
+                                <th>Email</th>
+                                <th>Q1</th>
+                                <th>Q2</th>
+                                <th>Q3</th>
+                                <th data-en="Timestamp" data-fr="Horodatage">Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody id="voterTable">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="last-updated">
+                <span data-en="Last updated:" data-fr="Dernière mise à jour :">Last updated:</span> <span id="lastUpdated"></span> • 
+                <span data-en="Auto-refreshes every 30 seconds" data-fr="Actualisation automatique toutes les 30 secondes">Auto-refreshes every 30 seconds</span>
+            </div>
+        </div>
+
+        <button class="refresh-btn" onclick="loadResults()">
+            <span data-en="🔄 Refresh Now" data-fr="🔄 Actualiser">🔄 Refresh Now</span>
+        </button>
+    </div>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZW73O34AQDahI2YEqTWdilyOirLwWQiFT5sGUjKoZNIkfEtYJIJMe6Bc_ffC2S7xCig/exec?vote=strategic_framework_vote';
+        
+        let currentLang = 'en';
+        let votesChart, consensusChart;
+
+        const translations = {
+            en: {
+                question1: 'Question 1',
+                question2: 'Question 2',
+                question3: 'Question 3',
+                yesVotes: 'Yes Votes',
+                noVotes: 'No Votes',
+                q1Label: 'Q1: Shared Objective',
+                q2Label: 'Q2: Coordination Structure',
+                q3Label: 'Q3: Governing Framework',
+                strong: 'Strong',
+                moderate: 'Moderate',
+                emerging: 'Emerging',
+                low: 'Low',
+                consensus: 'Consensus',
+                averageAgreement: 'average agreement'
+            },
+            fr: {
+                question1: 'Question 1',
+                question2: 'Question 2',
+                question3: 'Question 3',
+                yesVotes: 'Votes Oui',
+                noVotes: 'Votes Non',
+                q1Label: 'Q1: Objectif Partagé',
+                q2Label: 'Q2: Structure de Coordination',
+                q3Label: 'Q3: Cadre de Gouvernance',
+                strong: 'Fort',
+                moderate: 'Modéré',
+                emerging: 'Émergent',
+                low: 'Faible',
+                consensus: 'Consensus',
+                averageAgreement: 'd\'accord en moyenne'
+            }
+        };
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+
+            // Update button states
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('lang-' + lang).classList.add('active');
+
+            // Update all translatable elements
+            document.querySelectorAll('[data-en]').forEach(element => {
+                const text = element.getAttribute('data-' + lang);
+                element.textContent = text;
+            });
+
+            // Update charts if they exist
+            if (votesChart && consensusChart) {
+                updateChartLabels();
+            }
+        }
+
+        function updateChartLabels() {
+            const t = translations[currentLang];
+
+            // Update votes chart
+            if (votesChart) {
+                votesChart.data.labels = [t.question1, t.question2, t.question3];
+                votesChart.data.datasets[0].label = t.yesVotes;
+                votesChart.data.datasets[1].label = t.noVotes;
+                votesChart.update();
+            }
+
+            // Update consensus chart
+            if (consensusChart) {
+                consensusChart.data.labels = [t.q1Label, t.q2Label, t.q3Label];
+                consensusChart.update();
+            }
+        }
+
+        async function loadResults() {
+            try {
+                const response = await fetch(SCRIPT_URL);
+                const result = await response.json();
+
+                if (result.success) {
+                    displayResults(result.data);
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('dashboard').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error loading results:', error);
+                const errorMsg = currentLang === 'en' 
+                    ? 'Error loading dashboard. Please refresh.'
+                    : 'Erreur de chargement du tableau de bord. Veuillez actualiser.';
+                document.getElementById('loading').innerHTML = `<p style="color: #ff6b6b;">${errorMsg}</p>`;
+            }
+        }
+
+        function displayResults(data) {
+            document.getElementById('totalVotes').textContent = data.totalVotes;
+
+            const q1Percent = data.totalVotes > 0 ? Math.round((data.q1Yes / data.totalVotes) * 100) : 0;
+            const q2Percent = data.totalVotes > 0 ? Math.round((data.q2Yes / data.totalVotes) * 100) : 0;
+            const q3Percent = data.totalVotes > 0 ? Math.round((data.q3Yes / data.totalVotes) * 100) : 0;
+
+            document.getElementById('q1Percent').textContent = q1Percent + '%';
+            document.getElementById('q2Percent').textContent = q2Percent + '%';
+            document.getElementById('q3Percent').textContent = q3Percent + '%';
+
+            const overallConsensus = Math.round((q1Percent + q2Percent + q3Percent) / 3);
+            document.getElementById('consensusFill').style.width = overallConsensus + '%';
+            document.getElementById('consensusFill').textContent = overallConsensus + '%';
+
+            const t = translations[currentLang];
+            let consensusLevel = t.low;
+            if (overallConsensus >= 80) consensusLevel = t.strong;
+            else if (overallConsensus >= 60) consensusLevel = t.moderate;
+            else if (overallConsensus >= 40) consensusLevel = t.emerging;
+
+            document.getElementById('consensusText').textContent = `${consensusLevel} ${t.consensus} (${overallConsensus}% ${t.averageAgreement})`;
+
+            updateVotesChart(data);
+            updateConsensusChart(q1Percent, q2Percent, q3Percent);
+
+            const tbody = document.getElementById('voterTable');
+            tbody.innerHTML = '';
+
+            data.voters.forEach((voter, index) => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${voter.name}</td>
+                    <td style="color: rgba(255,255,255,0.6); font-size: 0.85rem;">${voter.email}</td>
+                    <td><span class="vote-badge vote-${voter.q1.toLowerCase()}">${voter.q1}</span></td>
+                    <td><span class="vote-badge vote-${voter.q2.toLowerCase()}">${voter.q2}</span></td>
+                    <td><span class="vote-badge vote-${voter.q3.toLowerCase()}">${voter.q3}</span></td>
+                    <td style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">${new Date().toLocaleString()}</td>
+                `;
+            });
+
+            document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+        }
+
+        function updateVotesChart(data) {
+            const ctx = document.getElementById('votesChart');
+            const t = translations[currentLang];
+
+            if (votesChart) {
+                votesChart.destroy();
+            }
+
+            votesChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [t.question1, t.question2, t.question3],
+                    datasets: [{
+                        label: t.yesVotes,
+                        data: [data.q1Yes, data.q2Yes, data.q3Yes],
+                        backgroundColor: 'rgba(0, 151, 57, 0.8)',
+                        borderColor: 'rgba(0, 151, 57, 1)',
+                        borderWidth: 2
+                    }, {
+                        label: t.noVotes,
+                        data: [
+                            data.totalVotes - data.q1Yes,
+                            data.totalVotes - data.q2Yes,
+                            data.totalVotes - data.q3Yes
+                        ],
+                        backgroundColor: 'rgba(206, 17, 38, 0.8)',
+                        borderColor: 'rgba(206, 17, 38, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'rgba(255, 255, 255, 0.8)',
+                                font: { size: 12 }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.6)',
+                                stepSize: 1
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.6)'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateConsensusChart(q1, q2, q3) {
+            const ctx = document.getElementById('consensusChart');
+            const t = translations[currentLang];
+
+            if (consensusChart) {
+                consensusChart.destroy();
+            }
+
+            consensusChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: [t.q1Label, t.q2Label, t.q3Label],
+                    datasets: [{
+                        data: [q1, q2, q3],
+                        backgroundColor: [
+                            'rgba(0, 151, 57, 0.8)',
+                            'rgba(252, 209, 22, 0.8)',
+                            'rgba(0, 181, 71, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(0, 151, 57, 1)',
+                            'rgba(252, 209, 22, 1)',
+                            'rgba(0, 181, 71, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: 'rgba(255, 255, 255, 0.8)',
+                                font: { size: 11 },
+                                padding: 15
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        loadResults();
+        setInterval(loadResults, 30000);
+    </script>
+</body>
+</html>

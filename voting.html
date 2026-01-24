@@ -3,266 +3,669 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Strategic Framework Vote</title>
-    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Strategic Framework Vote - Project C</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Sora', sans-serif;
             background: linear-gradient(135deg, #009739 0%, #FCD116 100%);
             min-height: 100vh;
             padding: 20px;
+            position: relative;
         }
-        
-        .container {
-            max-width: 700px;
-            margin: 40px auto;
-            background: white;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+
+        .flag-colors {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, #009739 0%, #CE1126 50%, #FCD116 100%);
+            z-index: 1000;
         }
-        
-        h1 {
-            color: #009739;
-            text-align: center;
-            margin-bottom: 10px;
-            font-size: 2rem;
-        }
-        
-        .subtitle {
-            text-align: center;
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 1.1rem;
-        }
-        
-        .context {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            border-left: 4px solid #009739;
-        }
-        
-        .form-group {
-            margin-bottom: 25px;
-        }
-        
-        label {
-            display: block;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
-        }
-        
-        input[type="text"],
-        input[type="email"] {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-family: 'Sora', sans-serif;
-            transition: border-color 0.3s;
-        }
-        
-        input:focus {
-            outline: none;
-            border-color: #009739;
-        }
-        
-        .question {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .question-number {
-            background: #009739;
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            margin-right: 10px;
-        }
-        
-        .question-text {
-            font-weight: 600;
-            margin-bottom: 15px;
-            font-size: 1.1rem;
-        }
-        
-        .radio-group {
+
+        .language-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
             display: flex;
-            gap: 20px;
+            gap: 5px;
+            background: rgba(255,255,255,0.95);
+            padding: 5px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 999;
         }
-        
-        .radio-option {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-        }
-        
-        input[type="radio"] {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-        }
-        
-        .submit-btn {
-            width: 100%;
-            padding: 15px;
-            background: #009739;
-            color: white;
+
+        .lang-btn {
+            padding: 10px 20px;
             border: none;
-            border-radius: 10px;
-            font-size: 1.2rem;
+            border-radius: 50px;
+            font-size: 0.9rem;
             font-weight: 700;
+            background: transparent;
+            color: #333;
             cursor: pointer;
             transition: all 0.3s;
             font-family: 'Sora', sans-serif;
         }
-        
-        .submit-btn:hover {
-            background: #007a2f;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,151,57,0.3);
+
+        .lang-btn:hover {
+            background: rgba(0,151,57,0.1);
         }
-        
+
+        .lang-btn.active {
+            background: linear-gradient(135deg, #009739 0%, #00b547 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(0,151,57,0.3);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .watermark {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 3rem;
+            opacity: 0.05;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            color: #009739;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .date {
+            font-size: 0.9rem;
+            color: #999;
+            font-weight: 600;
+        }
+
+        .context-box {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            border-left: 5px solid #009739;
+            position: relative;
+        }
+
+        .context-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            opacity: 0.3;
+        }
+
+        .context-box h3 {
+            color: #009739;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .context-box p {
+            color: #555;
+            line-height: 1.8;
+            font-size: 0.95rem;
+        }
+
+        .form-section {
+            margin-bottom: 35px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #f0f0f0;
+        }
+
+        .section-icon {
+            background: linear-gradient(135deg, #009739 0%, #00b547 100%);
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,151,57,0.3);
+        }
+
+        .section-title h2 {
+            color: #333;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        label .required {
+            color: #CE1126;
+            margin-left: 3px;
+        }
+
+        input[type="text"],
+        input[type="email"] {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: 'Sora', sans-serif;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #009739;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(0,151,57,0.1);
+        }
+
+        .helper-text {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .question-card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .question-card:hover {
+            border-color: #009739;
+            box-shadow: 0 5px 20px rgba(0,151,57,0.1);
+        }
+
+        .question-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .question-number {
+            background: linear-gradient(135deg, #009739 0%, #FCD116 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            box-shadow: 0 4px 15px rgba(0,151,57,0.3);
+        }
+
+        .question-text {
+            flex: 1;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .radio-option {
+            flex: 1;
+            position: relative;
+        }
+
+        .radio-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px 20px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .radio-option input[type="radio"]:checked + .radio-label {
+            background: linear-gradient(135deg, #009739 0%, #00b547 100%);
+            color: white;
+            border-color: #009739;
+            box-shadow: 0 5px 20px rgba(0,151,57,0.3);
+        }
+
+        .radio-label:hover {
+            border-color: #009739;
+            transform: translateY(-2px);
+        }
+
+        .submit-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 3px solid #f0f0f0;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 20px;
+            background: linear-gradient(135deg, #009739 0%, #00b547 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Sora', sans-serif;
+            box-shadow: 0 8px 25px rgba(0,151,57,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0,151,57,0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
         .submit-btn:disabled {
             background: #ccc;
             cursor: not-allowed;
             transform: none;
+            box-shadow: none;
         }
-        
+
         .message {
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 25px;
             display: none;
+            animation: slideIn 0.3s ease;
         }
-        
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         .success {
             background: #d4edda;
             color: #155724;
             border: 2px solid #c3e6cb;
         }
-        
+
         .error {
             background: #f8d7da;
             color: #721c24;
             border: 2px solid #f5c6cb;
         }
-        
+
         .loading {
             text-align: center;
-            padding: 20px;
+            padding: 30px;
             display: none;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #009739;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #f0f0f0;
+            color: #999;
+            font-size: 0.9rem;
+        }
+
+        .footer strong {
+            color: #009739;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .radio-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .question-header {
+                flex-direction: column;
+            }
+
+            .section-title {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .language-switcher {
+                top: 10px;
+                right: 10px;
+            }
+
+            .lang-btn {
+                padding: 8px 15px;
+                font-size: 0.85rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🗳️ Strategic Framework Vote</h1>
-        <p class="subtitle">Official Decision on Next Steps</p>
-        
-        <div class="context">
-            <strong>Context:</strong> For nearly four weeks, we have continued this debate without formally recording a decision. The moment demands clarity. To bring this matter to responsible closure—and so history can record that we addressed it deliberately and in good faith—we propose a simple vote focused on process, not ideology.
-        </div>
-        
-        <form id="voteForm">
-            <div class="form-group">
-                <label>Full Name *</label>
-                <input type="text" id="voterName" required>
-            </div>
-            
-            <div class="form-group">
-                <label>Email Address *</label>
-                <input type="email" id="voterEmail" required>
-                <small style="color: #666;">Each email can only vote once. Your identity will be recorded for transparency.</small>
-            </div>
-            
-            <div class="question">
-                <div class="question-text">
-                    <span class="question-number">1</span>
-                    Do we agree on a shared minimum objective for the next 6-12 months?
-                </div>
-                <div class="radio-group">
-                    <label class="radio-option">
-                        <input type="radio" name="q1" value="Yes" required> Yes
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="q1" value="No"> No
-                    </label>
-                </div>
-            </div>
-            
-            <div class="question">
-                <div class="question-text">
-                    <span class="question-number">2</span>
-                    Do we agree to establish a temporary coordination structure to facilitate alignment?
-                </div>
-                <div class="radio-group">
-                    <label class="radio-option">
-                        <input type="radio" name="q2" value="Yes" required> Yes
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="q2" value="No"> No
-                    </label>
-                </div>
-            </div>
-            
-            <div class="question">
-                <div class="question-text">
-                    <span class="question-number">3</span>
-                    Do we agree to seek consensus, and establish a governing framework that can be reviewed and optimized on a scheduled basis?
-                </div>
-                <div class="radio-group">
-                    <label class="radio-option">
-                        <input type="radio" name="q3" value="Yes" required> Yes
-                    </label>
-                    <label class="radio-option">
-                        <input type="radio" name="q3" value="No"> No
-                    </label>
-                </div>
-            </div>
-            
-            <button type="submit" class="submit-btn" id="submitBtn">Cast My Vote</button>
-        </form>
-        
-        <div class="loading" id="loading">
-            <p>⏳ Submitting your vote...</p>
-        </div>
-        
-        <div class="message" id="message"></div>
+    <div class="flag-colors"></div>
+    
+    <div class="language-switcher">
+        <button class="lang-btn active" onclick="switchLanguage('en')" id="lang-en">English</button>
+        <button class="lang-btn" onclick="switchLanguage('fr')" id="lang-fr">Français</button>
     </div>
     
-    <script>
-        // ⚠️ REPLACE THIS WITH YOUR ACTUAL DEPLOYMENT URL
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZW73O34AQDahI2YEqTWdilyOirLwWQiFT5sGUjKoZNIkfEtYJIJMe6Bc_ffC2S7xCig/exec';
+    <div class="container">
+        <div class="watermark">🇨🇲</div>
         
+        <div class="header">
+            <div class="logo">🗳️</div>
+            <h1 data-en="Strategic Framework Proposal" data-fr="Proposition de Cadre Stratégique">Strategic Framework Proposal</h1>
+            <p class="subtitle" data-en="Official Decision Vote" data-fr="Vote de Décision Officielle">Official Decision Vote</p>
+            <p class="date" data-en="January 2026 • Project C" data-fr="Janvier 2026 • Projet C">January 2026 • Project C</p>
+        </div>
+
+        <div class="context-box">
+            <div class="context-icon">💭</div>
+            <h3 data-en="Context & Purpose" data-fr="Contexte & Objectif">Context & Purpose</h3>
+            <p data-en="For nearly four weeks, we have continued this debate without formally recording a decision. The moment demands clarity. To bring this matter to responsible closure—and so history can record that we addressed it deliberately and in good faith—we propose a simple vote focused on process, not ideology." 
+               data-fr="Pendant près de quatre semaines, nous avons poursuivi ce débat sans enregistrer formellement une décision. Le moment exige de la clarté. Pour clore cette question de manière responsable—et pour que l'histoire puisse enregistrer que nous l'avons abordée délibérément et de bonne foi—nous proposons un vote simple axé sur le processus, pas sur l'idéologie.">
+                For nearly four weeks, we have continued this debate without formally recording a decision. The moment demands clarity. To bring this matter to responsible closure—and so history can record that we addressed it deliberately and in good faith—we propose a simple vote focused on process, not ideology.
+            </p>
+        </div>
+
+        <form id="voteForm">
+            <div class="form-section">
+                <div class="section-title">
+                    <div class="section-icon">👤</div>
+                    <h2 data-en="Your Information" data-fr="Vos Informations">Your Information</h2>
+                </div>
+
+                <div class="form-group">
+                    <label data-en="Full Name" data-fr="Nom Complet">
+                        <span class="label-text">Full Name</span> <span class="required">*</span>
+                    </label>
+                    <input type="text" id="voterName" required 
+                           data-placeholder-en="Enter your full name"
+                           data-placeholder-fr="Entrez votre nom complet"
+                           placeholder="Enter your full name">
+                </div>
+
+                <div class="form-group">
+                    <label data-en="Email Address" data-fr="Adresse Email">
+                        <span class="label-text">Email Address</span> <span class="required">*</span>
+                    </label>
+                    <input type="email" id="voterEmail" required 
+                           data-placeholder-en="your.email@example.com"
+                           data-placeholder-fr="votre.email@exemple.com"
+                           placeholder="your.email@example.com">
+                    <div class="helper-text" 
+                         data-en="ℹ️ Each email can only vote once. Your identity will be recorded for transparency."
+                         data-fr="ℹ️ Chaque email ne peut voter qu'une seule fois. Votre identité sera enregistrée pour la transparence.">
+                        ℹ️ Each email can only vote once. Your identity will be recorded for transparency.
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="section-title">
+                    <div class="section-icon">📋</div>
+                    <h2 data-en="Vote on Framework Questions" data-fr="Votez sur les Questions du Cadre">Vote on Framework Questions</h2>
+                </div>
+
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">1</div>
+                        <div class="question-text" 
+                             data-en="Do we agree on a shared minimum objective for the next 6-12 months?"
+                             data-fr="Sommes-nous d'accord sur un objectif minimum partagé pour les 6-12 prochains mois ?">
+                            Do we agree on a shared minimum objective for the next 6-12 months?
+                        </div>
+                    </div>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" name="q1" value="Yes" id="q1-yes" required>
+                            <label for="q1-yes" class="radio-label">
+                                <span data-en="✓ Yes" data-fr="✓ Oui">✓ Yes</span>
+                            </label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="q1" value="No" id="q1-no">
+                            <label for="q1-no" class="radio-label">
+                                <span data-en="✗ No" data-fr="✗ Non">✗ No</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">2</div>
+                        <div class="question-text" 
+                             data-en="Do we agree to establish a temporary coordination structure to facilitate alignment?"
+                             data-fr="Sommes-nous d'accord pour établir une structure de coordination temporaire pour faciliter l'alignement ?">
+                            Do we agree to establish a temporary coordination structure to facilitate alignment?
+                        </div>
+                    </div>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" name="q2" value="Yes" id="q2-yes" required>
+                            <label for="q2-yes" class="radio-label">
+                                <span data-en="✓ Yes" data-fr="✓ Oui">✓ Yes</span>
+                            </label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="q2" value="No" id="q2-no">
+                            <label for="q2-no" class="radio-label">
+                                <span data-en="✗ No" data-fr="✗ Non">✗ No</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number">3</div>
+                        <div class="question-text" 
+                             data-en="Do we agree to seek consensus, and establish a governing framework that can be reviewed and optimized on a scheduled basis?"
+                             data-fr="Sommes-nous d'accord pour rechercher un consensus et établir un cadre de gouvernance qui peut être révisé et optimisé sur une base programmée ?">
+                            Do we agree to seek consensus, and establish a governing framework that can be reviewed and optimized on a scheduled basis?
+                        </div>
+                    </div>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" name="q3" value="Yes" id="q3-yes" required>
+                            <label for="q3-yes" class="radio-label">
+                                <span data-en="✓ Yes" data-fr="✓ Oui">✓ Yes</span>
+                            </label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" name="q3" value="No" id="q3-no">
+                            <label for="q3-no" class="radio-label">
+                                <span data-en="✗ No" data-fr="✗ Non">✗ No</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="submit-section">
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <span data-en="🗳️ Cast My Official Vote" data-fr="🗳️ Soumettre Mon Vote Officiel">🗳️ Cast My Official Vote</span>
+                </button>
+            </div>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="color: #666; font-weight: 600;" 
+               data-en="Submitting your vote securely..."
+               data-fr="Soumission de votre vote en toute sécurité...">
+                Submitting your vote securely...
+            </p>
+        </div>
+
+        <div class="message" id="message"></div>
+
+        <div class="footer">
+            <strong>Project C</strong> • <span data-en="Democratic Resistance Movement" data-fr="Mouvement de Résistance Démocratique">Democratic Resistance Movement</span> • Cameroon 🇨🇲
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZW73O34AQDahI2YEqTWdilyOirLwWQiFT5sGUjKoZNIkfEtYJIJMe6Bc_ffC2S7xCig/exec';
+        let currentLang = 'en';
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+
+            // Update button states
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById('lang-' + lang).classList.add('active');
+
+            // Update all translatable elements
+            document.querySelectorAll('[data-en]').forEach(element => {
+                const text = element.getAttribute('data-' + lang);
+                if (element.tagName === 'INPUT') {
+                    element.placeholder = element.getAttribute('data-placeholder-' + lang);
+                } else if (element.tagName === 'LABEL') {
+                    const labelText = element.querySelector('.label-text');
+                    if (labelText) {
+                        labelText.textContent = text;
+                    } else {
+                        const required = element.querySelector('.required');
+                        element.childNodes[0].textContent = text + ' ';
+                    }
+                } else if (element.tagName === 'SPAN') {
+                    element.textContent = text;
+                } else {
+                    element.textContent = text;
+                }
+            });
+
+            // Update placeholders
+            document.querySelectorAll('[data-placeholder-en]').forEach(input => {
+                input.placeholder = input.getAttribute('data-placeholder-' + lang);
+            });
+        }
+
         document.getElementById('voteForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const submitBtn = document.getElementById('submitBtn');
             const loading = document.getElementById('loading');
             const message = document.getElementById('message');
             const form = document.getElementById('voteForm');
-            
-            // Hide previous messages
+
             message.style.display = 'none';
             form.style.display = 'none';
             loading.style.display = 'block';
             submitBtn.disabled = true;
-            
+
             const data = {
                 voteId: 'strategic_framework_vote',
                 voterName: document.getElementById('voterName').value,
@@ -270,35 +673,69 @@
                 q1: document.querySelector('input[name="q1"]:checked').value,
                 q2: document.querySelector('input[name="q2"]:checked').value,
                 q3: document.querySelector('input[name="q3"]:checked').value,
-                language: 'en'
+                language: currentLang,
+                timestamp: new Date().toISOString()
             };
-            
+
             try {
                 const response = await fetch(SCRIPT_URL, {
                     method: 'POST',
                     body: JSON.stringify(data)
                 });
-                
+
                 const result = await response.json();
-                
+
                 loading.style.display = 'none';
                 message.style.display = 'block';
-                
+
                 if (result.success) {
                     message.className = 'message success';
-                    message.innerHTML = '<strong>✅ Vote Recorded!</strong><br>Your vote has been officially recorded. Thank you for participating.';
+                    const successTitle = currentLang === 'en' ? '✅ Vote Recorded Successfully!' : '✅ Vote Enregistré avec Succès !';
+                    const successText = currentLang === 'en' 
+                        ? 'Your vote has been officially recorded and will be included in the final decision.'
+                        : 'Votre vote a été officiellement enregistré et sera inclus dans la décision finale.';
+                    const thankYou = currentLang === 'en'
+                        ? 'Thank you for participating in this important decision.'
+                        : 'Merci d\'avoir participé à cette décision importante.';
+                    
+                    message.innerHTML = `
+                        <h2 style="margin-bottom: 15px;">${successTitle}</h2>
+                        <p style="font-size: 1.1rem; margin-bottom: 10px;">${successText}</p>
+                        <p style="font-size: 0.9rem; opacity: 0.8;">${thankYou}</p>
+                    `;
                 } else {
                     message.className = 'message error';
-                    message.innerHTML = '<strong>❌ Error:</strong> ' + (result.error || 'Unknown error');
+                    const errorTitle = currentLang === 'en' ? '❌ Submission Error' : '❌ Erreur de Soumission';
+                    const errorLabel = currentLang === 'en' ? 'Error:' : 'Erreur :';
+                    const tryAgain = currentLang === 'en'
+                        ? 'Please try again or contact support if the issue persists.'
+                        : 'Veuillez réessayer ou contacter le support si le problème persiste.';
+                    
+                    message.innerHTML = `
+                        <h2 style="margin-bottom: 15px;">${errorTitle}</h2>
+                        <p style="font-size: 1.1rem; margin-bottom: 10px;"><strong>${errorLabel}</strong> ${result.error}</p>
+                        <p style="font-size: 0.9rem;">${tryAgain}</p>
+                    `;
                     form.style.display = 'block';
                     submitBtn.disabled = false;
                 }
-                
+
             } catch (error) {
                 loading.style.display = 'none';
                 message.style.display = 'block';
                 message.className = 'message error';
-                message.innerHTML = '<strong>❌ Error:</strong> ' + error.message;
+                
+                const errorTitle = currentLang === 'en' ? '❌ Connection Error' : '❌ Erreur de Connexion';
+                const errorLabel = currentLang === 'en' ? 'Error:' : 'Erreur :';
+                const checkConnection = currentLang === 'en'
+                    ? 'Please check your internet connection and try again.'
+                    : 'Veuillez vérifier votre connexion Internet et réessayer.';
+                
+                message.innerHTML = `
+                    <h2 style="margin-bottom: 15px;">${errorTitle}</h2>
+                    <p style="font-size: 1.1rem; margin-bottom: 10px;"><strong>${errorLabel}</strong> ${error.message}</p>
+                    <p style="font-size: 0.9rem;">${checkConnection}</p>
+                `;
                 form.style.display = 'block';
                 submitBtn.disabled = false;
             }
