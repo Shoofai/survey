@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Builder Poll - Enhanced Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Sora', sans-serif; 
+            background: #0a0e27;
+            min-height: 100vh;
+            padding: 1vw;
+            overflow-x: hidden;
+        }
+        .container {
+            width: 98vw;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #1a1f3a 0%, #0f1729 100%);
+            border-radius: 1.5vw;
+            padding: 2vw;
+            box-shadow: 0 2vw 6vw rgba(0,0,0,0.5);
+            border: 1px solid rgba(0,151,57,0.2);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2vw;
+            padding-bottom: 1.5vw;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        .header-left h1 { 
+            color: #00ff6a;
+            font-size: 2.5vw; 
+            font-weight: 800; 
+            margin-bottom: 0.5vw;
+            text-shadow: 0 0 1.5vw rgba(0,255,106,0.3);
+        }
+        .subtitle {
+            font-size: 1.1vw;
+            color: rgba(255,255,255,0.7);
+        }
+        .lang-switcher {
+            position: fixed;
+            top: 2vw;
+            right: 12vw;
+            display: flex;
+            gap: 0.3vw;
+            background: rgba(255,255,255,0.05);
+            padding: 0.3vw;
+            border-radius: 3vw;
+            border: 1px solid rgba(0,151,57,0.3);
+            z-index: 1000;
+        }
+        .lang-btn {
+            padding: 0.8vw 1.5vw;
+            border: none;
+            border-radius: 3vw;
+            font-size: 0.9vw;
+            font-weight: 700;
+            background: transparent;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Sora', sans-serif;
+        }
+        .lang-btn.active {
+            background: #009739;
+            color: white;
+        }
+        .back-btn {
+            padding: 0.8vw 1.5vw;
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            border-radius: 0.5vw;
+            font-weight: 700;
+            transition: all 0.3s;
+            border: 1px solid rgba(0,151,57,0.3);
+            font-size: 0.9vw;
+        }
+        .back-btn:hover {
+            background: rgba(0,151,57,0.2);
+            border-color: #00ff6a;
+            transform: translateX(-0.3vw);
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(15vw, 1fr));
+            gap: 1.5vw;
+            margin-bottom: 2vw;
+        }
+        .metric-card {
+            background: linear-gradient(135deg, rgba(0,151,57,0.1) 0%, rgba(0,151,57,0.05) 100%);
+            border-radius: 1vw;
+            padding: 1.5vw;
+            border-left: 0.3vw solid #00ff6a;
+            border: 1px solid rgba(0,151,57,0.3);
+            box-shadow: 0 0.3vw 1vw rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        .metric-label {
+            font-size: 0.75vw;
+            color: rgba(255,255,255,0.6);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05vw;
+            margin-bottom: 0.5vw;
+        }
+        .metric-value {
+            font-size: 2.5vw;
+            font-weight: 800;
+            color: #00ff6a;
+            text-shadow: 0 0 1.5vw rgba(0,255,106,0.3);
+        }
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(30vw, 1fr));
+            gap: 1.5vw;
+            margin-bottom: 2vw;
+        }
+        .chart-card {
+            background: rgba(255,255,255,0.03);
+            border-radius: 1vw;
+            padding: 1.5vw;
+            box-shadow: 0 0.3vw 1vw rgba(0,0,0,0.3);
+            border: 1px solid rgba(0,151,57,0.2);
+        }
+        .chart-card.full-width {
+            grid-column: 1 / -1;
+        }
+        .chart-title {
+            font-size: 1.1vw;
+            font-weight: 700;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 1vw;
+            text-align: center;
+        }
+        .skills-ranking {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.8vw;
+        }
+        .skill-rank-item {
+            background: rgba(255,255,255,0.05);
+            padding: 0.8vw;
+            border-radius: 0.5vw;
+            display: flex;
+            align-items: center;
+            gap: 1vw;
+            border-left: 0.3vw solid #00ff6a;
+        }
+        .skill-rank {
+            font-size: 1.5vw;
+            font-weight: 800;
+            color: #00ff6a;
+            min-width: 2.5vw;
+            text-align: center;
+        }
+        .skill-name {
+            flex: 1;
+            font-size: 0.85vw;
+            color: rgba(255,255,255,0.9);
+            font-weight: 600;
+        }
+        .skill-bar {
+            width: 15vw;
+            height: 0.5vw;
+            background: rgba(255,255,255,0.1);
+            border-radius: 0.3vw;
+            overflow: hidden;
+        }
+        .skill-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #009739 0%, #00ff6a 100%);
+            box-shadow: 0 0 0.5vw rgba(0,255,106,0.5);
+        }
+        .skill-count {
+            font-size: 0.75vw;
+            color: rgba(255,255,255,0.6);
+            min-width: 3vw;
+            text-align: right;
+        }
+        .combo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(18vw, 1fr));
+            gap: 1vw;
+        }
+        .combo-item {
+            background: rgba(0,151,57,0.1);
+            padding: 1vw;
+            border-radius: 0.5vw;
+            border: 1px solid rgba(0,151,57,0.3);
+        }
+        .combo-skills {
+            font-size: 0.75vw;
+            color: rgba(255,255,255,0.9);
+            font-weight: 600;
+            margin-bottom: 0.3vw;
+        }
+        .combo-count {
+            font-size: 1.2vw;
+            color: #00ff6a;
+            font-weight: 800;
+        }
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.3vw;
+        }
+        .heatmap-cell {
+            aspect-ratio: 1;
+            border-radius: 0.3vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7vw;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        .heatmap-cell:hover {
+            transform: scale(1.1);
+        }
+        .heatmap-label {
+            font-size: 0.6vw;
+            color: rgba(255,255,255,0.6);
+        }
+        .heatmap-value {
+            font-size: 0.9vw;
+            color: rgba(255,255,255,0.9);
+            font-weight: 800;
+        }
+        .engagement-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(18vw, 1fr));
+            gap: 1vw;
+        }
+        .engagement-item {
+            background: rgba(0,151,57,0.1);
+            padding: 1.2vw;
+            border-radius: 0.5vw;
+            border: 1px solid rgba(0,151,57,0.3);
+            text-align: center;
+        }
+        .engagement-name {
+            font-size: 0.75vw;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 0.5vw;
+            font-weight: 600;
+        }
+        .engagement-score {
+            font-size: 2vw;
+            font-weight: 800;
+            color: #00ff6a;
+            margin-bottom: 0.3vw;
+        }
+        .engagement-rank {
+            font-size: 0.7vw;
+            color: rgba(255,255,255,0.6);
+        }
+        .geo-heatmap {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(12vw, 1fr));
+            gap: 0.8vw;
+        }
+        .geo-heat-item {
+            background: rgba(0,151,57,0.1);
+            padding: 1vw;
+            border-radius: 0.5vw;
+            border: 1px solid rgba(0,151,57,0.3);
+            text-align: center;
+        }
+        .geo-flag {
+            font-size: 2vw;
+            margin-bottom: 0.5vw;
+        }
+        .geo-location {
+            font-size: 0.75vw;
+            color: rgba(255,255,255,0.9);
+            font-weight: 600;
+            margin-bottom: 0.3vw;
+        }
+        .geo-count {
+            font-size: 1.5vw;
+            color: #00ff6a;
+            font-weight: 800;
+        }
+        .loading {
+            text-align: center;
+            padding: 5vw;
+            font-size: 1.1vw;
+            color: rgba(255,255,255,0.7);
+        }
+        .spinner {
+            border: 0.4vw solid rgba(255,255,255,0.1);
+            border-top: 0.4vw solid #00ff6a;
+            border-radius: 50%;
+            width: 4vw;
+            height: 4vw;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1.5vw;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .refresh-btn {
+            position: fixed;
+            bottom: 2vw;
+            right: 2vw;
+            padding: 1vw 2vw;
+            background: linear-gradient(135deg, #009739 0%, #00ff6a 100%);
+            color: white;
+            border: none;
+            border-radius: 3vw;
+            font-weight: 700;
+            font-size: 0.9vw;
+            cursor: pointer;
+            box-shadow: 0 0.5vw 1.5vw rgba(0,255,106,0.4);
+            transition: all 0.3s;
+            font-family: 'Sora', sans-serif;
+        }
+        .refresh-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0.8vw 2vw rgba(0,255,106,0.6);
+        }
+        @media (max-width: 768px) {
+            .lang-btn, .back-btn { font-size: 2.5vw; padding: 2vw 4vw; }
+            h1 { font-size: 5vw !important; }
+            .subtitle { font-size: 3vw; }
+            .metric-label { font-size: 2vw; }
+            .metric-value { font-size: 6vw; }
+            .chart-title { font-size: 3.5vw; }
+            .skill-name { font-size: 2.5vw; }
+            .refresh-btn { font-size: 2.5vw; padding: 2.5vw 5vw; }
+        }
+    </style>
+</head>
+<body>
+    <div class="lang-switcher">
+        <button class="lang-btn active" onclick="switchLanguage('en')" id="lang-en">EN</button>
+        <button class="lang-btn" onclick="switchLanguage('fr')" id="lang-fr">FR</button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <h1 data-en="💪 Builder Poll Analytics" data-fr="💪 Analyses Sondage Bâtisseurs">💪 Builder Poll Analytics</h1>
+                <p class="subtitle" data-en="Skills, Availability & Engagement" data-fr="Compétences, Disponibilité & Engagement">Skills, Availability & Engagement</p>
+            </div>
+            <a href="dashboard-overview-ENHANCED.html" class="back-btn" data-en="← Overview" data-fr="← Aperçu">← Overview</a>
+        </div>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p data-en="Loading builder analytics..." data-fr="Chargement des analyses...">Loading builder analytics...</p>
+        </div>
+
+        <div id="content" style="display: none;">
+            <!-- Metrics -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label" data-en="Total Builders" data-fr="Bâtisseurs Totaux">Total Builders</div>
+                    <div class="metric-value" id="totalBuilders">0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label" data-en="Total Hours/Mo" data-fr="Heures Tot./Mois">Total Hours/Mo</div>
+                    <div class="metric-value" id="totalHours">0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label" data-en="Unique Skills" data-fr="Compétences Uniques">Unique Skills</div>
+                    <div class="metric-value" id="uniqueSkills">0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label" data-en="Avg Engagement" data-fr="Engagement Moy.">Avg Engagement</div>
+                    <div class="metric-value" id="avgEngagement">0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label" data-en="Countries" data-fr="Pays">Countries</div>
+                    <div class="metric-value" id="countryCount">0</div>
+                </div>
+            </div>
+
+            <!-- Top 10 Skills -->
+            <div class="chart-card full-width">
+                <div class="chart-title" data-en="🏆 Top 10 Skills Ranked" data-fr="🏆 Top 10 Compétences">🏆 Top 10 Skills Ranked</div>
+                <div class="skills-ranking" id="skillsRanking"></div>
+            </div>
+
+            <!-- Skill Combinations -->
+            <div class="chart-card full-width">
+                <div class="chart-title" data-en="🔗 Common Skill Combinations" data-fr="🔗 Combinaisons de Compétences">🔗 Common Skill Combinations</div>
+                <div class="combo-grid" id="skillCombos"></div>
+            </div>
+
+            <!-- Availability Heatmap -->
+            <div class="chart-card full-width">
+                <div class="chart-title" data-en="📅 Availability Heatmap (Hours by Day)" data-fr="📅 Carte de Disponibilité">📅 Availability Heatmap (Hours by Day)</div>
+                <div class="heatmap-grid" id="availabilityHeatmap"></div>
+            </div>
+
+            <!-- Builder Engagement Scores -->
+            <div class="chart-card full-width">
+                <div class="chart-title" data-en="⭐ Builder Engagement Scores" data-fr="⭐ Scores d'Engagement">⭐ Builder Engagement Scores</div>
+                <div class="engagement-grid" id="engagementScores"></div>
+            </div>
+
+            <!-- Geographic Heat Map -->
+            <div class="chart-card full-width">
+                <div class="chart-title" data-en="🌍 Geographic Distribution" data-fr="🌍 Distribution Géographique">🌍 Geographic Distribution</div>
+                <div class="geo-heatmap" id="geoHeatmap"></div>
+            </div>
+        </div>
+    </div>
+
+    <button class="refresh-btn" onclick="loadData()">
+        <span data-en="🔄 Refresh" data-fr="🔄 Actualiser">🔄 Refresh</span>
+    </button>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZW73O34AQDahI2YEqTWdilyOirLwWQiFT5sGUjKoZNIkfEtYJIJMe6Bc_ffC2S7xCig/exec';
+        let currentLang = 'en';
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('lang-' + lang).classList.add('active');
+            document.querySelectorAll('[data-en]').forEach(el => {
+                el.textContent = el.getAttribute('data-' + lang);
+            });
+        }
+
+        async function loadData() {
+            try {
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('content').style.display = 'none';
+
+                const response = await fetch(SCRIPT_URL + '?survey=builders_poll_2026');
+                const data = await response.json();
+                processData(data.responses || []);
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function processData(responses) {
+            document.getElementById('totalBuilders').textContent = responses.length;
+
+            // Calculate total hours
+            const hourMap = {
+                '1-5 hours': 3,
+                '5-10 hours': 7.5,
+                '10-20 hours': 15,
+                '20+ hours': 25,
+                'Support only': 0
+            };
+            const totalHours = responses.reduce((sum, r) => 
+                sum + (hourMap[r['Q3 (Hours)']] || 0), 0);
+            document.getElementById('totalHours').textContent = Math.round(totalHours);
+
+            // Unique skills
+            const allSkills = new Set();
+            responses.forEach(r => {
+                (r['Q2 (Skills)'] || '').split(';').forEach(s => {
+                    const clean = s.trim();
+                    if (clean && !clean.startsWith('Other:')) allSkills.add(clean);
+                });
+            });
+            document.getElementById('uniqueSkills').textContent = allSkills.size;
+
+            // Countries
+            const countries = new Set();
+            responses.forEach(r => {
+                const loc = (r['Q4 (Location)'] || '').split(',');
+                if (loc.length > 1) countries.add(loc[loc.length - 1].trim());
+            });
+            document.getElementById('countryCount').textContent = countries.size;
+
+            // Average engagement score
+            const avgScore = responses.reduce((sum, r) => {
+                const hours = hourMap[r['Q3 (Hours)']] || 0;
+                const skills = (r['Q2 (Skills)'] || '').split(';').filter(s => s.trim()).length;
+                const pillars = (r['Q1 (Pillars)'] || '').split(';').filter(p => p.trim()).length;
+                return sum + (hours + skills * 2 + pillars * 3);
+            }, 0) / responses.length;
+            document.getElementById('avgEngagement').textContent = avgScore.toFixed(0);
+
+            // Create visualizations
+            createSkillsRanking(responses);
+            createSkillCombinations(responses);
+            createAvailabilityHeatmap(responses);
+            createEngagementScores(responses);
+            createGeoHeatmap(responses);
+        }
+
+        function createSkillsRanking(responses) {
+            const skillCounts = {};
+            responses.forEach(r => {
+                (r['Q2 (Skills)'] || '').split(';').forEach(s => {
+                    const clean = s.trim();
+                    if (clean && !clean.startsWith('Other:')) {
+                        skillCounts[clean] = (skillCounts[clean] || 0) + 1;
+                    }
+                });
+            });
+
+            const sorted = Object.entries(skillCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 10);
+
+            const maxCount = sorted[0]?.[1] || 1;
+            const container = document.getElementById('skillsRanking');
+            
+            container.innerHTML = sorted.map(([skill, count], i) => {
+                const pct = (count / maxCount * 100).toFixed(0);
+                return `
+                    <div class="skill-rank-item">
+                        <div class="skill-rank">${i + 1}</div>
+                        <div class="skill-name">${skill.length > 50 ? skill.substring(0, 47) + '...' : skill}</div>
+                        <div class="skill-bar">
+                            <div class="skill-fill" style="width: ${pct}%"></div>
+                        </div>
+                        <div class="skill-count">${count} ${currentLang === 'en' ? 'builders' : 'bâtisseurs'}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function createSkillCombinations(responses) {
+            const combos = {};
+            responses.forEach(r => {
+                const skills = (r['Q2 (Skills)'] || '').split(';')
+                    .map(s => s.trim())
+                    .filter(s => s && !s.startsWith('Other:'))
+                    .slice(0, 3);
+                
+                if (skills.length >= 2) {
+                    const key = skills.slice(0, 2).sort().join(' + ');
+                    combos[key] = (combos[key] || 0) + 1;
+                }
+            });
+
+            const sorted = Object.entries(combos)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 8);
+
+            const container = document.getElementById('skillCombos');
+            container.innerHTML = sorted.map(([combo, count]) => `
+                <div class="combo-item">
+                    <div class="combo-skills">${combo}</div>
+                    <div class="combo-count">${count} ${currentLang === 'en' ? 'builders' : 'bâtisseurs'}</div>
+                </div>
+            `).join('');
+        }
+
+        function createAvailabilityHeatmap(responses) {
+            const days = currentLang === 'en' 
+                ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                : ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+
+            // Mock data - in real app, would calculate from responses
+            const hourMap = {
+                '1-5 hours': 3,
+                '5-10 hours': 7.5,
+                '10-20 hours': 15,
+                '20+ hours': 25,
+                'Support only': 0
+            };
+
+            const dayHours = days.map(() => {
+                return responses.reduce((sum, r) => 
+                    sum + (hourMap[r['Q3 (Hours)']] || 0), 0) / 7;
+            });
+
+            const maxHours = Math.max(...dayHours);
+            const container = document.getElementById('availabilityHeatmap');
+            
+            container.innerHTML = days.map((day, i) => {
+                const hours = dayHours[i];
+                const intensity = (hours / maxHours);
+                const color = `rgba(0, 255, 106, ${0.2 + intensity * 0.8})`;
+                
+                return `
+                    <div class="heatmap-cell" style="background: ${color};">
+                        <div class="heatmap-label">${day}</div>
+                        <div class="heatmap-value">${Math.round(hours)}h</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function createEngagementScores(responses) {
+            const hourMap = {
+                '1-5 hours': 3,
+                '5-10 hours': 7.5,
+                '10-20 hours': 15,
+                '20+ hours': 25,
+                'Support only': 0
+            };
+
+            const builders = responses.map((r, i) => {
+                const hours = hourMap[r['Q3 (Hours)']] || 0;
+                const skills = (r['Q2 (Skills)'] || '').split(';').filter(s => s.trim()).length;
+                const pillars = (r['Q1 (Pillars)'] || '').split(';').filter(p => p.trim()).length;
+                const score = hours + (skills * 2) + (pillars * 3);
+                
+                return {
+                    name: r['Name'] || `Builder ${i + 1}`,
+                    score: score
+                };
+            }).sort((a, b) => b.score - a.score).slice(0, 8);
+
+            const container = document.getElementById('engagementScores');
+            container.innerHTML = builders.map((b, i) => `
+                <div class="engagement-item">
+                    <div class="engagement-name">${b.name}</div>
+                    <div class="engagement-score">${Math.round(b.score)}</div>
+                    <div class="engagement-rank">${currentLang === 'en' ? 'Rank' : 'Rang'} #${i + 1}</div>
+                </div>
+            `).join('');
+        }
+
+        function createGeoHeatmap(responses) {
+            const geoData = {};
+            responses.forEach(r => {
+                const loc = (r['Q4 (Location)'] || '').split(',');
+                if (loc.length > 1) {
+                    const country = loc[loc.length - 1].trim();
+                    geoData[country] = (geoData[country] || 0) + 1;
+                }
+            });
+
+            const flags = {
+                'Cameroon': '🇨🇲',
+                'France': '🇫🇷',
+                'USA': '🇺🇸',
+                'UK': '🇬🇧',
+                'Canada': '🇨🇦',
+                'Germany': '🇩🇪',
+                'Belgium': '🇧🇪'
+            };
+
+            const sorted = Object.entries(geoData).sort((a, b) => b[1] - a[1]);
+            const container = document.getElementById('geoHeatmap');
+            
+            container.innerHTML = sorted.map(([country, count]) => `
+                <div class="geo-heat-item">
+                    <div class="geo-flag">${flags[country] || '🌍'}</div>
+                    <div class="geo-location">${country}</div>
+                    <div class="geo-count">${count}</div>
+                </div>
+            `).join('');
+        }
+
+        loadData();
+    </script>
+</body>
+</html>

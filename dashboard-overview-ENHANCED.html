@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project C - Enhanced Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Sora', sans-serif; 
+            background: #0a0e27;
+            min-height: 100vh;
+            padding: 1vw;
+            overflow-x: hidden;
+        }
+        .container {
+            width: 98vw;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #1a1f3a 0%, #0f1729 100%);
+            border-radius: 1.5vw;
+            padding: 2vw;
+            box-shadow: 0 2vw 6vw rgba(0,0,0,0.5);
+            border: 1px solid rgba(0,151,57,0.2);
+        }
+        .lang-switcher {
+            position: fixed;
+            top: 2vw;
+            right: 2vw;
+            display: flex;
+            gap: 0.3vw;
+            background: rgba(255,255,255,0.05);
+            padding: 0.3vw;
+            border-radius: 3vw;
+            border: 1px solid rgba(0,151,57,0.3);
+            z-index: 1000;
+        }
+        .lang-btn {
+            padding: 0.8vw 1.5vw;
+            border: none;
+            border-radius: 3vw;
+            font-size: 0.9vw;
+            font-weight: 700;
+            background: transparent;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Sora', sans-serif;
+        }
+        .lang-btn.active {
+            background: #009739;
+            color: white;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 2vw;
+            padding-bottom: 1.5vw;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        h1 { 
+            color: #00ff6a;
+            font-size: 2.5vw; 
+            font-weight: 800; 
+            margin-bottom: 0.5vw;
+            text-shadow: 0 0 1.5vw rgba(0,255,106,0.3);
+        }
+        .subtitle {
+            font-size: 1.1vw;
+            color: rgba(255,255,255,0.7);
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(15vw, 1fr));
+            gap: 1.5vw;
+            margin-bottom: 2vw;
+        }
+        .metric-card {
+            background: linear-gradient(135deg, rgba(0,151,57,0.1) 0%, rgba(0,151,57,0.05) 100%);
+            border-radius: 1vw;
+            padding: 1.5vw;
+            border-left: 0.3vw solid #00ff6a;
+            border: 1px solid rgba(0,151,57,0.3);
+            box-shadow: 0 0.3vw 1vw rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+            text-align: center;
+        }
+        .metric-card:hover {
+            transform: translateY(-0.3vw);
+            box-shadow: 0 0.8vw 2vw rgba(0,255,106,0.2);
+        }
+        .metric-label {
+            font-size: 0.75vw;
+            color: rgba(255,255,255,0.6);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05vw;
+            margin-bottom: 0.5vw;
+        }
+        .metric-value {
+            font-size: 2.5vw;
+            font-weight: 800;
+            color: #00ff6a;
+            line-height: 1;
+            text-shadow: 0 0 1.5vw rgba(0,255,106,0.3);
+        }
+        .metric-detail {
+            font-size: 0.7vw;
+            color: rgba(255,255,255,0.5);
+            margin-top: 0.5vw;
+        }
+        .nav-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(22vw, 1fr));
+            gap: 1.5vw;
+            margin-bottom: 2vw;
+        }
+        .nav-card {
+            background: rgba(255,255,255,0.03);
+            border-radius: 1vw;
+            padding: 2vw;
+            border: 2px solid rgba(0,151,57,0.2);
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .nav-card:hover {
+            border-color: #00ff6a;
+            transform: translateY(-0.5vw);
+            box-shadow: 0 1vw 2.5vw rgba(0,255,106,0.3);
+            background: rgba(0,151,57,0.1);
+        }
+        .nav-card h3 {
+            color: #00ff6a;
+            font-size: 1.5vw;
+            margin-bottom: 1vw;
+        }
+        .nav-card p {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9vw;
+            margin-bottom: 1.5vw;
+            min-height: 3vw;
+        }
+        .nav-btn {
+            display: inline-block;
+            padding: 0.8vw 2vw;
+            background: linear-gradient(135deg, #009739 0%, #00ff6a 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 0.5vw;
+            font-weight: 700;
+            font-size: 0.9vw;
+            transition: all 0.3s;
+            box-shadow: 0 0.3vw 1vw rgba(0,255,106,0.3);
+        }
+        .nav-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0.5vw 1.5vw rgba(0,255,106,0.5);
+        }
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(30vw, 1fr));
+            gap: 1.5vw;
+        }
+        .chart-card {
+            background: rgba(255,255,255,0.03);
+            border-radius: 1vw;
+            padding: 1.5vw;
+            box-shadow: 0 0.3vw 1vw rgba(0,0,0,0.3);
+            border: 1px solid rgba(0,151,57,0.2);
+        }
+        .chart-title {
+            font-size: 1.1vw;
+            font-weight: 700;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 1vw;
+            text-align: center;
+        }
+        .loading {
+            text-align: center;
+            padding: 5vw;
+            font-size: 1.1vw;
+            color: rgba(255,255,255,0.7);
+        }
+        .spinner {
+            border: 0.4vw solid rgba(255,255,255,0.1);
+            border-top: 0.4vw solid #00ff6a;
+            border-radius: 50%;
+            width: 4vw;
+            height: 4vw;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1.5vw;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .refresh-btn {
+            position: fixed;
+            bottom: 2vw;
+            right: 2vw;
+            padding: 1vw 2vw;
+            background: linear-gradient(135deg, #009739 0%, #00ff6a 100%);
+            color: white;
+            border: none;
+            border-radius: 3vw;
+            font-weight: 700;
+            font-size: 0.9vw;
+            cursor: pointer;
+            box-shadow: 0 0.5vw 1.5vw rgba(0,255,106,0.4);
+            transition: all 0.3s;
+            font-family: 'Sora', sans-serif;
+        }
+        .refresh-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0.8vw 2vw rgba(0,255,106,0.6);
+        }
+        @media (max-width: 768px) {
+            .lang-btn { font-size: 2.5vw; padding: 2vw 4vw; }
+            h1 { font-size: 5vw; }
+            .subtitle { font-size: 3vw; }
+            .metric-label { font-size: 2vw; }
+            .metric-value { font-size: 6vw; }
+            .metric-detail { font-size: 2vw; }
+            .chart-title { font-size: 3.5vw; }
+            .nav-card h3 { font-size: 4vw; }
+            .nav-card p { font-size: 2.5vw; min-height: auto; }
+            .nav-btn { font-size: 2.5vw; padding: 2vw 4vw; }
+            .refresh-btn { font-size: 2.5vw; padding: 2.5vw 5vw; }
+        }
+    </style>
+</head>
+<body>
+    <div class="lang-switcher">
+        <button class="lang-btn active" onclick="switchLanguage('en')" id="lang-en">EN</button>
+        <button class="lang-btn" onclick="switchLanguage('fr')" id="lang-fr">FR</button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1 data-en="🌍 Project C Enhanced Dashboard" data-fr="🌍 Tableau de Bord Amélioré">🌍 Project C Enhanced Dashboard</h1>
+            <p class="subtitle" data-en="Advanced Analytics & Insights" data-fr="Analyses Avancées & Perspectives">Advanced Analytics & Insights</p>
+        </div>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p data-en="Loading enhanced metrics..." data-fr="Chargement...">Loading enhanced metrics...</p>
+        </div>
+
+        <div id="content" style="display: none;">
+            <!-- Metrics Grid -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label" data-en="Total Responses" data-fr="Réponses Totales">Total Responses</div>
+                    <div class="metric-value" id="totalResponses">0</div>
+                    <div class="metric-detail" data-en="Across both polls" data-fr="Sur les deux sondages">Across both polls</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label" data-en="Response Rate" data-fr="Taux de Réponse">Response Rate</div>
+                    <div class="metric-value" id="responseRate">0</div>
+                    <div class="metric-detail" data-en="Responses per day" data-fr="Réponses par jour">Responses per day</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label" data-en="Avg Confidence" data-fr="Confiance Moy.">Avg Confidence</div>
+                    <div class="metric-value" id="avgConfidence">0</div>
+                    <div class="metric-detail" data-en="Out of 10" data-fr="Sur 10">Out of 10</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label" data-en="Builders" data-fr="Bâtisseurs">Builders</div>
+                    <div class="metric-value" id="builderCount">0</div>
+                    <div class="metric-detail" data-en="Active volunteers" data-fr="Volontaires actifs">Active volunteers</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label" data-en="Total Hours/Mo" data-fr="Heures/Mois">Total Hours/Mo</div>
+                    <div class="metric-value" id="totalHours">0</div>
+                    <div class="metric-detail" data-en="Committed capacity" data-fr="Capacité">Committed capacity</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label" data-en="Countries" data-fr="Pays">Countries</div>
+                    <div class="metric-value" id="countryCount">0</div>
+                    <div class="metric-detail" data-en="Global reach" data-fr="Portée mondiale">Global reach</div>
+                </div>
+            </div>
+
+            <!-- Navigation Cards -->
+            <div class="nav-cards">
+                <div class="nav-card" onclick="window.location.href='dashboard-priority-ENHANCED.html'">
+                    <h3>🌍 <span data-en="Priority Poll" data-fr="Sondage Priorités">Priority Poll</span></h3>
+                    <p data-en="Confidence distribution, pillar ranking, geographic spread" data-fr="Distribution de confiance, classement piliers">Confidence distribution, pillar ranking, geographic spread</p>
+                    <a href="dashboard-priority-ENHANCED.html" class="nav-btn" data-en="View Analytics →" data-fr="Voir Analyses →">View Analytics →</a>
+                </div>
+                <div class="nav-card" onclick="window.location.href='dashboard-builders-ENHANCED.html'">
+                    <h3>💪 <span data-en="Builder Poll" data-fr="Sondage Bâtisseurs">Builder Poll</span></h3>
+                    <p data-en="Skills ranking, combinations, availability, engagement scores" data-fr="Classement compétences, disponibilité">Skills ranking, combinations, availability, engagement scores</p>
+                    <a href="dashboard-builders-ENHANCED.html" class="nav-btn" data-en="View Analytics →" data-fr="Voir Analyses →">View Analytics →</a>
+                </div>
+                <div class="nav-card" onclick="window.location.href='dashboard-topics-ENHANCED.html'">
+                    <h3>💡 <span data-en="Topics Cloud" data-fr="Nuage de Sujets">Topics Cloud</span></h3>
+                    <p data-en="Interactive word cloud of suggested discussion topics" data-fr="Nuage interactif des sujets suggérés">Interactive word cloud of suggested discussion topics</p>
+                    <a href="dashboard-topics-ENHANCED.html" class="nav-btn" data-en="View Topics →" data-fr="Voir Sujets →">View Topics →</a>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-section">
+                <div class="chart-card">
+                    <div class="chart-title" data-en="Response Timeline" data-fr="Chronologie">Response Timeline</div>
+                    <canvas id="timelineChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-title" data-en="Language Distribution" data-fr="Distribution Langues">Language Distribution</div>
+                    <canvas id="languageChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-title" data-en="Engagement by Day" data-fr="Engagement par Jour">Engagement by Day</div>
+                    <canvas id="dowChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="refresh-btn" onclick="loadData()">
+        <span data-en="🔄 Refresh Data" data-fr="🔄 Actualiser">🔄 Refresh Data</span>
+    </button>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZW73O34AQDahI2YEqTWdilyOirLwWQiFT5sGUjKoZNIkfEtYJIJMe6Bc_ffC2S7xCig/exec';
+        let currentLang = 'en';
+        let charts = {};
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('lang-' + lang).classList.add('active');
+            document.querySelectorAll('[data-en]').forEach(el => {
+                el.textContent = el.getAttribute('data-' + lang);
+            });
+        }
+
+        async function loadData() {
+            try {
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('content').style.display = 'none';
+
+                const [priorityRes, builderRes] = await Promise.all([
+                    fetch(SCRIPT_URL + '?survey=priority_poll_2026'),
+                    fetch(SCRIPT_URL + '?survey=builders_poll_2026')
+                ]);
+
+                const priorityData = await priorityRes.json();
+                const builderData = await builderRes.json();
+
+                processData(priorityData.responses || [], builderData.responses || []);
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function processData(priority, builder) {
+            const total = priority.length + builder.length;
+            document.getElementById('totalResponses').textContent = total;
+            document.getElementById('builderCount').textContent = builder.length;
+
+            // Response rate
+            const allResponses = [...priority, ...builder];
+            if (allResponses.length > 0) {
+                const dates = allResponses.map(r => new Date(r.Timestamp)).sort((a, b) => a - b);
+                const days = Math.max(1, Math.ceil((dates[dates.length - 1] - dates[0]) / (1000 * 60 * 60 * 24)));
+                document.getElementById('responseRate').textContent = (total / days).toFixed(1);
+            }
+
+            // Confidence
+            if (priority.length > 0) {
+                const avgConf = priority.reduce((sum, r) => sum + parseInt(r['Q1 (Confidence)'] || 0), 0) / priority.length;
+                document.getElementById('avgConfidence').textContent = avgConf.toFixed(1);
+            }
+
+            // Hours
+            const hourMap = {
+                '1-5 hours': 3,
+                '5-10 hours': 7.5,
+                '10-20 hours': 15,
+                '20+ hours': 25,
+                'Support only': 0
+            };
+            const totalHours = builder.reduce((sum, r) => sum + (hourMap[r['Q3 (Hours)']] || 0), 0);
+            document.getElementById('totalHours').textContent = Math.round(totalHours);
+
+            // Countries
+            const countries = new Set();
+            builder.forEach(r => {
+                const loc = (r['Q4 (Location)'] || '').split(',');
+                if (loc.length > 1) countries.add(loc[loc.length - 1].trim());
+            });
+            document.getElementById('countryCount').textContent = countries.size;
+
+            // Create charts
+            createTimelineChart(priority, builder);
+            createLanguageChart(priority, builder);
+            createDOWChart(priority, builder);
+        }
+
+        function createTimelineChart(priority, builder) {
+            const ctx = document.getElementById('timelineChart').getContext('2d');
+            if (charts.timeline) charts.timeline.destroy();
+
+            const dateGroups = {};
+            [...priority, ...builder].forEach(r => {
+                const date = new Date(r.Timestamp).toLocaleDateString();
+                dateGroups[date] = (dateGroups[date] || 0) + 1;
+            });
+
+            const dates = Object.keys(dateGroups).sort();
+            const counts = dates.map(d => dateGroups[d]);
+
+            charts.timeline = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: currentLang === 'en' ? 'Responses' : 'Réponses',
+                        data: counts,
+                        borderColor: '#00ff6a',
+                        backgroundColor: 'rgba(0, 255, 106, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            ticks: { color: 'rgba(255,255,255,0.7)' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        },
+                        x: {
+                            ticks: { color: 'rgba(255,255,255,0.7)' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createLanguageChart(priority, builder) {
+            const ctx = document.getElementById('languageChart').getContext('2d');
+            if (charts.language) charts.language.destroy();
+
+            const langCount = { en: 0, fr: 0 };
+            [...priority, ...builder].forEach(r => {
+                langCount[r.Language || 'en']++;
+            });
+
+            charts.language = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['English', 'Français'],
+                    datasets: [{
+                        data: [langCount.en, langCount.fr],
+                        backgroundColor: ['#00ff6a', '#FCD116'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: 'rgba(255,255,255,0.9)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createDOWChart(priority, builder) {
+            const ctx = document.getElementById('dowChart').getContext('2d');
+            if (charts.dow) charts.dow.destroy();
+
+            const dowCounts = Array(7).fill(0);
+            [...priority, ...builder].forEach(r => {
+                dowCounts[new Date(r.Timestamp).getDay()]++;
+            });
+
+            const days = currentLang === 'en' 
+                ? ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+                : ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+
+            charts.dow = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: days,
+                    datasets: [{
+                        label: currentLang === 'en' ? 'Responses' : 'Réponses',
+                        data: dowCounts,
+                        backgroundColor: '#00ff6a',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            ticks: { color: 'rgba(255,255,255,0.7)' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        },
+                        x: {
+                            ticks: { color: 'rgba(255,255,255,0.7)' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        loadData();
+    </script>
+</body>
+</html>

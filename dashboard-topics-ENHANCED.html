@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topics Word Cloud - Enhanced</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Sora', sans-serif; 
+            background: #0a0e27;
+            min-height: 100vh;
+            padding: 1vw;
+            overflow-x: hidden;
+        }
+        .container {
+            width: 98vw;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #1a1f3a 0%, #0f1729 100%);
+            border-radius: 1.5vw;
+            padding: 2vw;
+            box-shadow: 0 2vw 6vw rgba(0,0,0,0.5);
+            border: 1px solid rgba(0,151,57,0.2);
+            min-height: 90vh;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2vw;
+            padding-bottom: 1.5vw;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        .header-left h1 { 
+            color: #00ff6a;
+            font-size: 2.5vw; 
+            font-weight: 800; 
+            margin-bottom: 0.5vw;
+            text-shadow: 0 0 1.5vw rgba(0,255,106,0.3);
+        }
+        .subtitle {
+            font-size: 1.1vw;
+            color: rgba(255,255,255,0.7);
+        }
+        .lang-switcher {
+            position: fixed;
+            top: 2vw;
+            right: 12vw;
+            display: flex;
+            gap: 0.3vw;
+            background: rgba(255,255,255,0.05);
+            padding: 0.3vw;
+            border-radius: 3vw;
+            border: 1px solid rgba(0,151,57,0.3);
+            z-index: 1000;
+        }
+        .lang-btn {
+            padding: 0.8vw 1.5vw;
+            border: none;
+            border-radius: 3vw;
+            font-size: 0.9vw;
+            font-weight: 700;
+            background: transparent;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Sora', sans-serif;
+        }
+        .lang-btn.active {
+            background: #009739;
+            color: white;
+        }
+        .back-btn {
+            padding: 0.8vw 1.5vw;
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            border-radius: 0.5vw;
+            font-weight: 700;
+            transition: all 0.3s;
+            border: 1px solid rgba(0,151,57,0.3);
+            font-size: 0.9vw;
+        }
+        .back-btn:hover {
+            background: rgba(0,151,57,0.2);
+            border-color: #00ff6a;
+            transform: translateX(-0.3vw);
+        }
+        .word-cloud-section {
+            background: rgba(255,255,255,0.03);
+            border-radius: 1vw;
+            padding: 2vw;
+            border: 1px solid rgba(0,151,57,0.2);
+            margin-bottom: 2vw;
+        }
+        .topics-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1vw;
+            justify-content: center;
+            align-items: center;
+            padding: 3vw;
+            min-height: 40vw;
+        }
+        .topic-word {
+            padding: 0.5vw 1.2vw;
+            background: rgba(0,151,57,0.15);
+            border-radius: 2vw;
+            border: 1px solid rgba(0,151,57,0.3);
+            font-weight: 600;
+            transition: all 0.3s;
+            cursor: default;
+        }
+        .topic-word:hover {
+            transform: scale(1.1);
+            background: rgba(0,151,57,0.3);
+            box-shadow: 0 0 1.5vw rgba(0,255,106,0.3);
+        }
+        .topic-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(15vw, 1fr));
+            gap: 1.5vw;
+            margin-top: 2vw;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, rgba(0,151,57,0.1) 0%, rgba(0,151,57,0.05) 100%);
+            border-radius: 1vw;
+            padding: 1.5vw;
+            border-left: 0.3vw solid #00ff6a;
+            border: 1px solid rgba(0,151,57,0.3);
+            text-align: center;
+        }
+        .stat-label {
+            font-size: 0.75vw;
+            color: rgba(255,255,255,0.6);
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 0.5vw;
+        }
+        .stat-value {
+            font-size: 2.5vw;
+            font-weight: 800;
+            color: #00ff6a;
+            text-shadow: 0 0 1.5vw rgba(0,255,106,0.3);
+        }
+        .loading {
+            text-align: center;
+            padding: 5vw;
+            font-size: 1.1vw;
+            color: rgba(255,255,255,0.7);
+        }
+        .spinner {
+            border: 0.4vw solid rgba(255,255,255,0.1);
+            border-top: 0.4vw solid #00ff6a;
+            border-radius: 50%;
+            width: 4vw;
+            height: 4vw;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1.5vw;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .refresh-btn {
+            position: fixed;
+            bottom: 2vw;
+            right: 2vw;
+            padding: 1vw 2vw;
+            background: linear-gradient(135deg, #009739 0%, #00ff6a 100%);
+            color: white;
+            border: none;
+            border-radius: 3vw;
+            font-weight: 700;
+            font-size: 0.9vw;
+            cursor: pointer;
+            box-shadow: 0 0.5vw 1.5vw rgba(0,255,106,0.4);
+            transition: all 0.3s;
+            font-family: 'Sora', sans-serif;
+        }
+        .refresh-btn:hover {
+            transform: scale(1.05);
+        }
+        @media (max-width: 768px) {
+            .lang-btn, .back-btn { font-size: 2.5vw; padding: 2vw 4vw; }
+            h1 { font-size: 5vw !important; }
+            .subtitle { font-size: 3vw; }
+            .stat-label { font-size: 2vw; }
+            .stat-value { font-size: 6vw; }
+        }
+    </style>
+</head>
+<body>
+    <div class="lang-switcher">
+        <button class="lang-btn active" onclick="switchLanguage('en')" id="lang-en">EN</button>
+        <button class="lang-btn" onclick="switchLanguage('fr')" id="lang-fr">FR</button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <h1 data-en="💡 Topics Word Cloud" data-fr="💡 Nuage de Mots des Sujets">💡 Topics Word Cloud</h1>
+                <p class="subtitle" data-en="Suggested Discussion Topics from Priority Poll" data-fr="Sujets de Discussion Suggérés">Suggested Discussion Topics from Priority Poll</p>
+            </div>
+            <a href="dashboard-overview-ENHANCED.html" class="back-btn" data-en="← Overview" data-fr="← Aperçu">← Overview</a>
+        </div>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p data-en="Loading topics..." data-fr="Chargement des sujets...">Loading topics...</p>
+        </div>
+
+        <div id="content" style="display: none;">
+            <div class="word-cloud-section">
+                <div class="topics-cloud" id="topicsCloud"></div>
+            </div>
+
+            <div class="topic-stats">
+                <div class="stat-card">
+                    <div class="stat-label" data-en="Total Topics" data-fr="Sujets Totaux">Total Topics</div>
+                    <div class="stat-value" id="totalTopics">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label" data-en="Unique Topics" data-fr="Sujets Uniques">Unique Topics</div>
+                    <div class="stat-value" id="uniqueTopics">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label" data-en="Most Mentioned" data-fr="Plus Mentionné">Most Mentioned</div>
+                    <div class="stat-value" id="topTopic" style="font-size: 1.2vw;">---</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="refresh-btn" onclick="loadData()">
+        <span data-en="🔄 Refresh" data-fr="🔄 Actualiser">🔄 Refresh</span>
+    </button>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZW73O34AQDahI2YEqTWdilyOirLwWQiFT5sGUjKoZNIkfEtYJIJMe6Bc_ffC2S7xCig/exec';
+        let currentLang = 'en';
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('lang-' + lang).classList.add('active');
+            document.querySelectorAll('[data-en]').forEach(el => {
+                el.textContent = el.getAttribute('data-' + lang);
+            });
+        }
+
+        async function loadData() {
+            try {
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('content').style.display = 'none';
+
+                const response = await fetch(SCRIPT_URL + '?survey=priority_poll_2026');
+                const data = await response.json();
+                processData(data.responses || []);
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function processData(responses) {
+            const topicCounts = {};
+            let totalTopics = 0;
+
+            responses.forEach(r => {
+                const topics = r['Q3 (Topics)'];
+                if (topics && topics !== 'N/A' && topics.trim()) {
+                    topics.split(/[,;]/).forEach(topic => {
+                        const clean = topic.trim().toLowerCase();
+                        if (clean.length > 3) {
+                            topicCounts[clean] = (topicCounts[clean] || 0) + 1;
+                            totalTopics++;
+                        }
+                    });
+                }
+            });
+
+            const sorted = Object.entries(topicCounts).sort((a, b) => b[1] - a[1]);
+            const maxCount = sorted[0]?.[1] || 1;
+
+            // Update stats
+            document.getElementById('totalTopics').textContent = totalTopics;
+            document.getElementById('uniqueTopics').textContent = sorted.length;
+            document.getElementById('topTopic').textContent = sorted[0]?.[0] || 'N/A';
+
+            // Create word cloud
+            const container = document.getElementById('topicsCloud');
+            container.innerHTML = sorted.map(([topic, count]) => {
+                const size = 0.7 + (count / maxCount) * 2.5; // 0.7vw to 3.2vw
+                const opacity = 0.5 + (count / maxCount) * 0.5; // 0.5 to 1.0
+                const color = `rgba(0, 255, 106, ${opacity})`;
+                
+                return `
+                    <div class="topic-word" style="font-size: ${size}vw; color: ${color};" title="${count} mentions">
+                        ${topic}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        loadData();
+    </script>
+</body>
+</html>

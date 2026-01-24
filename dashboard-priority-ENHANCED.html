@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Priority Poll - Enhanced Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Sora', sans-serif; 
+            background: #0a0e27;
+            min-height: 100vh;
+            padding: 1vw;
+            overflow-x: hidden;
+        }
+        .container {
+            width: 98vw;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #1a1f3a 0%, #0f1729 100%);
+            border-radius: 1.5vw;
+            padding: 2vw;
+            box-shadow: 0 2vw 6vw rgba(0,0,0,0.5);
+            border: 1px solid rgba(0,151,57,0.2);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2vw;
+            padding-bottom: 1.5vw;
+            border-bottom: 2px solid rgba(255,255,255,0.1);
+        }
+        .header-left h1 { 
+            color: #00ff6a;
+            font-size: 2.5vw; 
+            font-weight: 800; 
+            margin-bottom: 0.5vw;
+            text-shadow: 0 0 1.5vw rgba(0,255,106,0.3);
+        }
+        .subtitle {
+            font-size: 1.1vw;
+            color: rgba(255,255,255,0.7);
+        }
+        .lang-switcher {
+            position: fixed;
+            top: 2vw;
+            right: 12vw;
+            display: flex;
+            gap: 0.3vw;
+            background: rgba(255,255,255,0.05);
+            padding: 0.3vw;
+            border-radius: 3vw;
+            border: 1px solid rgba(0,151,57,0.3);
+            z-index: 1000;
+        }
+        .lang-btn {
+            padding: 0.8vw 1.5vw;
+            border: none;
+            border-radius: 3vw;
+            font-size: 0.9vw;
+            font-weight: 700;
+            background: transparent;
+            color: rgba(255,255,255,0.7);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Sora', sans-serif;
+        }
+        .lang-btn.active {
+            background: #009739;
+            color: white;
+        }
+        .back-btn {
+            padding: 0.8vw 1.5vw;
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            border-radius: 0.5vw;
+            font-weight: 700;
+            transition: all 0.3s;
+            border: 1px solid rgba(0,151,57,0.3);
+            font-size: 0.9vw;
+        }
+        .back-btn:hover {
+            background: rgba(0,151,57,0.2);
+            border-color: #00ff6a;
+            transform: translateX(-0.3vw);
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(15vw, 1fr));
+            gap: 1.5vw;
+            margin-bottom: 2vw;
+        }
+        .metric-card {
+            background: linear-gradient(135deg, rgba(0,151,57,0.1) 0%, rgba(0,151,57,0.05) 100%);
+            border-radius: 1vw;
+            padding: 1.5vw;
+            border-left: 0.3vw solid #00ff6a;
+            border: 1px solid rgba(0,151,57,0.3);
+            box-shadow: 0 0.3vw 1vw rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        .metric-label {
+            font-size: 0.75vw;
+            color: rgba(255,255,255,0.6);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05vw;
+            margin-bottom: 0.5vw;
+        }
+        .metric-value {
+            font-size: 2.5vw;
+            font-weight: 800;
+            color: #00ff6a;
+            text-shadow: 0 0 1.5vw rgba(0,255,106,0.3);
+        }
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(30vw, 1fr));
+            gap: 1.5vw;
+            margin-bottom: 2vw;
+        }
+        .chart-card {
+            background: rgba(255,255,255,0.03);
+            border-radius: 1vw;
+            padding: 1.5vw;
+            box-shadow: 0 0.3vw 1vw rgba(0,0,0,0.3);
+            border: 1px solid rgba(0,151,57,0.2);
+        }
+        .chart-card.full-width {
+            grid-column: 1 / -1;
+        }
+        .chart-title {
+            font-size: 1.1vw;
+            font-weight: 700;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 1vw;
+            text-align: center;
+        }
+        .pillar-ranking {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1vw;
+            margin-top: 1vw;
+        }
+        .pillar-rank-item {
+            background: rgba(255,255,255,0.05);
+            padding: 1vw;
+            border-radius: 0.5vw;
+            border-left: 0.3vw solid #00ff6a;
+            display: flex;
+            align-items: center;
+            gap: 1vw;
+        }
+        .rank-number {
+            font-size: 2vw;
+            font-weight: 800;
+            color: #00ff6a;
+            width: 3vw;
+            text-align: center;
+        }
+        .pillar-info {
+            flex: 1;
+        }
+        .pillar-name {
+            font-weight: 700;
+            color: rgba(255,255,255,0.9);
+            font-size: 0.9vw;
+            margin-bottom: 0.3vw;
+        }
+        .pillar-stats {
+            font-size: 0.75vw;
+            color: rgba(255,255,255,0.6);
+        }
+        .pillar-bar {
+            width: 20vw;
+            height: 0.5vw;
+            background: rgba(255,255,255,0.1);
+            border-radius: 0.3vw;
+            overflow: hidden;
+        }
+        .pillar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #009739 0%, #00ff6a 100%);
+            box-shadow: 0 0 1vw rgba(0,255,106,0.5);
+        }
+        .geo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(12vw, 1fr));
+            gap: 0.8vw;
+            margin-top: 1vw;
+        }
+        .geo-item {
+            background: rgba(0,151,57,0.1);
+            padding: 0.8vw;
+            border-radius: 0.5vw;
+            border: 1px solid rgba(0,151,57,0.3);
+            text-align: center;
+        }
+        .geo-flag {
+            font-size: 2vw;
+            margin-bottom: 0.5vw;
+        }
+        .geo-location {
+            font-size: 0.75vw;
+            color: rgba(255,255,255,0.9);
+            font-weight: 600;
+            margin-bottom: 0.3vw;
+        }
+        .geo-count {
+            font-size: 1.5vw;
+            color: #00ff6a;
+            font-weight: 800;
+        }
+        .loading {
+            text-align: center;
+            padding: 5vw;
+            font-size: 1.1vw;
+            color: rgba(255,255,255,0.7);
+        }
+        .spinner {
+            border: 0.4vw solid rgba(255,255,255,0.1);
+            border-top: 0.4vw solid #00ff6a;
+            border-radius: 50%;
+            width: 4vw;
+            height: 4vw;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1.5vw;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .refresh-btn {
+            position: fixed;
+            bottom: 2vw;
+            right: 2vw;
+            padding: 1vw 2vw;
+            background: linear-gradient(135deg, #009739 0%, #00ff6a 100%);
+            color: white;
+            border: none;
+            border-radius: 3vw;
+            font-weight: 700;
+            font-size: 0.9vw;
+            cursor: pointer;
+            box-shadow: 0 0.5vw 1.5vw rgba(0,255,106,0.4);
+            transition: all 0.3s;
+            font-family: 'Sora', sans-serif;
+        }
+        .refresh-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0.8vw 2vw rgba(0,255,106,0.6);
+        }
+        @media (max-width: 768px) {
+            .lang-btn, .back-btn { font-size: 2.5vw; padding: 2vw 4vw; }
+            h1 { font-size: 5vw !important; }
+            .subtitle { font-size: 3vw; }
+            .metric-label { font-size: 2vw; }
+            .metric-value { font-size: 6vw; }
+            .chart-title { font-size: 3.5vw; }
+            .pillar-name { font-size: 2.5vw; }
+            .geo-location { font-size: 2vw; }
+            .refresh-btn { font-size: 2.5vw; padding: 2.5vw 5vw; }
+        }
+    </style>
+</head>
+<body>
+    <div class="lang-switcher">
+        <button class="lang-btn active" onclick="switchLanguage('en')" id="lang-en">EN</button>
+        <button class="lang-btn" onclick="switchLanguage('fr')" id="lang-fr">FR</button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <h1 data-en="🌍 Priority Poll Analytics" data-fr="🌍 Analyses Sondage Priorités">🌍 Priority Poll Analytics</h1>
+                <p class="subtitle" data-en="Confidence Levels & Pillar Preferences" data-fr="Niveaux de Confiance & Préférences">Confidence Levels & Pillar Preferences</p>
+            </div>
+            <a href="dashboard-overview-ENHANCED.html" class="back-btn" data-en="← Overview" data-fr="← Aperçu">← Overview</a>
+        </div>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p data-en="Loading priority analytics..." data-fr="Chargement des analyses...">Loading priority analytics...</p>
+        </div>
+
+        <div id="content" style="display: none;">
+            <!-- Metrics -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label" data-en="Total Responses" data-fr="Réponses Totales">Total Responses</div>
+                    <div class="metric-value" id="totalCount">0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label" data-en="Avg Confidence" data-fr="Confiance Moy.">Avg Confidence</div>
+                    <div class="metric-value" id="avgConfidence">0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label" data-en="High Confidence" data-fr="Forte Confiance">High Confidence</div>
+                    <div class="metric-value" id="highConf">0%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">English</div>
+                    <div class="metric-value" id="englishCount">0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Français</div>
+                    <div class="metric-value" id="frenchCount">0</div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <div class="chart-card">
+                    <div class="chart-title" data-en="Confidence Distribution" data-fr="Distribution de Confiance">Confidence Distribution</div>
+                    <canvas id="confDistChart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <div class="chart-title" data-en="Confidence Levels (1-10)" data-fr="Niveaux de Confiance (1-10)">Confidence Levels (1-10)</div>
+                    <canvas id="confChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Pillar Ranking -->
+            <div class="chart-card full-width">
+                <div class="chart-title" data-en="🏆 Pillar Popularity Ranking" data-fr="🏆 Classement Popularité Piliers">🏆 Pillar Popularity Ranking</div>
+                <div class="pillar-ranking" id="pillarRanking"></div>
+            </div>
+
+            <!-- Geographic Distribution -->
+            <div class="chart-card full-width">
+                <div class="chart-title" data-en="🌍 Geographic Distribution" data-fr="🌍 Distribution Géographique">🌍 Geographic Distribution</div>
+                <div class="geo-grid" id="geoGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <button class="refresh-btn" onclick="loadData()">
+        <span data-en="🔄 Refresh" data-fr="🔄 Actualiser">🔄 Refresh</span>
+    </button>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyZW73O34AQDahI2YEqTWdilyOirLwWQiFT5sGUjKoZNIkfEtYJIJMe6Bc_ffC2S7xCig/exec';
+        let currentLang = 'en';
+        let charts = {};
+
+        function switchLanguage(lang) {
+            currentLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('lang-' + lang).classList.add('active');
+            document.querySelectorAll('[data-en]').forEach(el => {
+                el.textContent = el.getAttribute('data-' + lang);
+            });
+        }
+
+        async function loadData() {
+            try {
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('content').style.display = 'none';
+
+                const response = await fetch(SCRIPT_URL + '?survey=priority_poll_2026');
+                const data = await response.json();
+                processData(data.responses || []);
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function processData(responses) {
+            document.getElementById('totalCount').textContent = responses.length;
+
+            // Confidence metrics
+            const confidences = responses.map(r => parseInt(r['Q1 (Confidence)'] || 0));
+            const avgConf = confidences.reduce((a, b) => a + b, 0) / confidences.length || 0;
+            document.getElementById('avgConfidence').textContent = avgConf.toFixed(1);
+
+            // High confidence % (8-10)
+            const highConf = confidences.filter(c => c >= 8).length;
+            const highPct = ((highConf / confidences.length) * 100) || 0;
+            document.getElementById('highConf').textContent = highPct.toFixed(0) + '%';
+
+            // Language
+            const langCount = { en: 0, fr: 0 };
+            responses.forEach(r => langCount[r.Language || 'en']++);
+            document.getElementById('englishCount').textContent = langCount.en;
+            document.getElementById('frenchCount').textContent = langCount.fr;
+
+            // Charts
+            createConfDistChart(confidences);
+            createConfChart(confidences);
+            createPillarRanking(responses);
+            createGeoDistribution(responses);
+        }
+
+        function createConfDistChart(confidences) {
+            const ctx = document.getElementById('confDistChart').getContext('2d');
+            if (charts.confDist) charts.confDist.destroy();
+
+            const low = confidences.filter(c => c <= 3).length;
+            const med = confidences.filter(c => c > 3 && c < 8).length;
+            const high = confidences.filter(c => c >= 8).length;
+            const total = confidences.length || 1;
+
+            charts.confDist = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: [
+                        currentLang === 'en' ? 'Low (1-3)' : 'Faible (1-3)',
+                        currentLang === 'en' ? 'Medium (4-7)' : 'Moyen (4-7)',
+                        currentLang === 'en' ? 'High (8-10)' : 'Fort (8-10)'
+                    ],
+                    datasets: [{
+                        data: [
+                            ((low/total)*100).toFixed(1),
+                            ((med/total)*100).toFixed(1),
+                            ((high/total)*100).toFixed(1)
+                        ],
+                        backgroundColor: ['#CE1126', '#FCD116', '#00ff6a'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: 'rgba(255,255,255,0.9)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createConfChart(confidences) {
+            const ctx = document.getElementById('confChart').getContext('2d');
+            if (charts.conf) charts.conf.destroy();
+
+            const counts = {};
+            for (let i = 1; i <= 10; i++) counts[i] = 0;
+            confidences.forEach(c => { if (c >= 1 && c <= 10) counts[c]++; });
+
+            charts.conf = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(counts),
+                    datasets: [{
+                        label: currentLang === 'en' ? 'Responses' : 'Réponses',
+                        data: Object.values(counts),
+                        backgroundColor: '#00ff6a',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            ticks: { color: 'rgba(255,255,255,0.7)' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        },
+                        x: {
+                            ticks: { color: 'rgba(255,255,255,0.7)' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createPillarRanking(responses) {
+            const pillarCounts = {};
+            responses.forEach(r => {
+                const pillar = r['Q2 (Pillar)'];
+                if (pillar) pillarCounts[pillar] = (pillarCounts[pillar] || 0) + 1;
+            });
+
+            const sorted = Object.entries(pillarCounts)
+                .sort((a, b) => b[1] - a[1]);
+
+            const total = responses.length || 1;
+            const container = document.getElementById('pillarRanking');
+            const icons = ['🥇', '🥈', '🥉', '4️⃣'];
+            
+            container.innerHTML = sorted.map(([pillar, count], i) => {
+                const pct = ((count / total) * 100).toFixed(1);
+                const shortName = pillar.includes('Governance') ? (currentLang === 'en' ? 'Governance & Institutional Reform' : 'Gouvernance & Réforme Institutionnelle')
+                    : pillar.includes('Social') ? (currentLang === 'en' ? 'Social Cohesion & Community' : 'Cohésion Sociale & Communauté')
+                    : pillar.includes('International') ? (currentLang === 'en' ? 'International Outreach & Advocacy' : 'Plaidoyer International')
+                    : pillar.includes('Economic') ? (currentLang === 'en' ? 'Economic & Reconstruction' : 'Économique & Reconstruction')
+                    : pillar;
+                
+                return `
+                    <div class="pillar-rank-item">
+                        <div class="rank-number">${icons[i] || (i+1)}</div>
+                        <div class="pillar-info">
+                            <div class="pillar-name">${shortName}</div>
+                            <div class="pillar-stats">${count} ${currentLang === 'en' ? 'responses' : 'réponses'} (${pct}%)</div>
+                        </div>
+                        <div class="pillar-bar">
+                            <div class="pillar-fill" style="width: ${pct}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function createGeoDistribution(responses) {
+            // Mock geographic data - in real app, would extract from responses
+            const geoData = {
+                '🇨🇲 Cameroon': Math.floor(responses.length * 0.15),
+                '🇫🇷 France': Math.floor(responses.length * 0.25),
+                '🇺🇸 USA': Math.floor(responses.length * 0.20),
+                '🇬🇧 UK': Math.floor(responses.length * 0.15),
+                '🇨🇦 Canada': Math.floor(responses.length * 0.10),
+                '🇩🇪 Germany': Math.floor(responses.length * 0.08),
+                '🇧🇪 Belgium': Math.floor(responses.length * 0.05),
+                '🌍 Other': Math.floor(responses.length * 0.02)
+            };
+
+            const container = document.getElementById('geoGrid');
+            container.innerHTML = Object.entries(geoData)
+                .filter(([_, count]) => count > 0)
+                .sort((a, b) => b[1] - a[1])
+                .map(([location, count]) => {
+                    const [flag, ...name] = location.split(' ');
+                    return `
+                        <div class="geo-item">
+                            <div class="geo-flag">${flag}</div>
+                            <div class="geo-location">${name.join(' ')}</div>
+                            <div class="geo-count">${count}</div>
+                        </div>
+                    `;
+                }).join('');
+        }
+
+        loadData();
+    </script>
+</body>
+</html>
